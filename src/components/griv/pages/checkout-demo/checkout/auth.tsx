@@ -127,8 +127,8 @@ export function ThreeDSStep({ mode, merchant, amount, cardLabel, onComplete, onF
 }
 
 /** "Check your phone" / "approve in your app" step for push, STK and app approvals. */
-export function DeviceApproval({ title, steps, detail, approveLabel = "Approve on phone", onApprove, onReject, onTimeout, onCancel, expiresAt }: {
-  title: string; steps: ReactNode[]; detail?: ReactNode; approveLabel?: string;
+export function DeviceApproval({ title, steps, detail, approveLabel = "Approve on phone", onApprove, onReject, onTimeout, onCancel, expiresAt, extra }: {
+  title: string; steps: ReactNode[]; detail?: ReactNode; approveLabel?: string; extra?: ReactNode;
   onApprove: () => void; onReject: () => void; onTimeout: () => void; onCancel: () => void; expiresAt?: string;
 }) {
   return (
@@ -156,6 +156,7 @@ export function DeviceApproval({ title, steps, detail, approveLabel = "Approve o
         <button className={demoBtn} onClick={onApprove}>{approveLabel}</button>
         <button className={demoBtn} onClick={onReject}>Reject</button>
         <button className={demoBtn} onClick={onTimeout}>Let it time out</button>
+        {extra}
       </DemoActions>
       <button className="btn btn-ghost mt-2 h-9 w-full text-sm" onClick={onCancel}>Cancel payment</button>
     </div>

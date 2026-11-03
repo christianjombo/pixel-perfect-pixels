@@ -305,6 +305,13 @@ export const visibleChannels = (enabled: ChannelId[], ctx: EligibilityContext) =
 export const channelProviders = (country: CountryCode, channel: ChannelId) =>
   getEntry(country, channel).providers.filter((p) => p.status !== "unavailable");
 
+/** Does the customer fill in anything before the payment can start? */
+export function needsDetails(country: CountryCode, channel: ChannelId) {
+  if (channel === "bank_transfer" || channel === "apple_pay" || channel === "google_pay") return false;
+  if (channel === "qr") return channelProviders(country, "qr").length > 1;
+  return true;
+}
+
 /** Phone number check for the country (accepts spaces and a leading 0 or dial code). */
 export function normalisePhone(country: CountryCode, raw: string) {
   const c = getCountry(country);
