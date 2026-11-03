@@ -107,10 +107,10 @@
 - [x] Tests for rules (search, last owner, permission dependencies, self-approval, IP validation, env separation), browser checks
 
 ## Checkout Demo (brief: GRIV — Original Checkout System) — 3 Nov 2026
-- [ ] Sidebar link (Payments → Checkout Demo) and /checkout-demo page
-- [ ] Country/channel registry, minor-unit money, card/phone validation
-- [ ] Checkout state machine (session vs attempts, dedupe callbacks) + timer-safe simulation hook + adapter contract
-- [ ] Reusable GrivCheckout: header, summary, method selector, all 12 channel flows, auth steps, result screens, receipt
-- [ ] Configuration panel, desktop/mobile/fullscreen/modal previews
-- [ ] Developer tools: timeline, session inspector, webhook JSON, simulation controls
-- [ ] Tests + browser checks
+- [x] Sidebar link (Payments → Checkout Demo) and /checkout-demo page
+- [x] Country/channel registry, minor-unit money, card/phone validation
+- [x] Checkout state machine (session vs attempts, dedupe callbacks) + timer-safe simulation hook + adapter contract
+- [x] Reusable GrivCheckout: header, summary, method selector, all 12 channel flows, auth steps, result screens, receipt
+- [x] Configuration panel, desktop/mobile/fullscreen/modal previews
+- [x] Developer tools: timeline, session inspector, webhook JSON, simulation controls
+- [x] Tests + browser checks
