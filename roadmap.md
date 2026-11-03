@@ -105,3 +105,12 @@
 - [x] Developers: API keys + Webhooks + IP whitelist (environment-specific), Integrations, API logs
 - [x] Monitoring: Security history, Audit logs, Access requests, Connected applications
 - [x] Tests for rules (search, last owner, permission dependencies, self-approval, IP validation, env separation), browser checks
+
+## Checkout Demo (brief: GRIV — Original Checkout System) — 3 Nov 2026
+- [ ] Sidebar link (Payments → Checkout Demo) and /checkout-demo page
+- [ ] Country/channel registry, minor-unit money, card/phone validation
+- [ ] Checkout state machine (session vs attempts, dedupe callbacks) + timer-safe simulation hook + adapter contract
+- [ ] Reusable GrivCheckout: header, summary, method selector, all 12 channel flows, auth steps, result screens, receipt
+- [ ] Configuration panel, desktop/mobile/fullscreen/modal previews
+- [ ] Developer tools: timeline, session inspector, webhook JSON, simulation controls
+- [ ] Tests + browser checks
