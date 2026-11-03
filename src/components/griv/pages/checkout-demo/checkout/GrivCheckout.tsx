@@ -77,10 +77,11 @@ export function GrivCheckout({ engine, ctx, merchantEmail, mode = "embedded", on
   }
 
   return (
-    <div className={cn("@container bg-card text-foreground", className)}>
-      <div className="flex min-h-full flex-col">
+    <div className={cn("@container flex flex-col bg-card text-foreground", className)}>
+      <div className="flex flex-1 flex-col">
         <CheckoutHeader onClose={onClose} back={mode === "hosted"} closeLabel={mode === "hosted" ? "Back to the demo" : "Close checkout"} />
-        <div className={cn("grid flex-1 @[34rem]:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]", mode === "hosted" && "mx-auto w-full max-w-5xl")}>
+        <div className={cn("flex flex-1 flex-col", mode === "hosted" && "bg-muted/60 px-4 py-6 @[34rem]:py-10")}>
+        <div className={cn("grid flex-1 @[34rem]:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]", mode === "hosted" && "mx-auto w-full max-w-5xl flex-none overflow-hidden rounded-2xl border bg-card")}>
           <aside className="border-b bg-secondary/60 p-5 @[34rem]:border-b-0 @[34rem]:border-r @[34rem]:p-6" aria-label="Payment summary">
             <CheckoutSummary merchant={s.merchantName} amountMinor={s.amountMinor} currency={s.currency} description={s.description} rows={rows} supportEmail={merchantEmail} />
           </aside>
@@ -88,6 +89,7 @@ export function GrivCheckout({ engine, ctx, merchantEmail, mode = "embedded", on
             <p className="sr-only" aria-live="polite">{STATUS_TEXT[s.status] ?? ""}</p>
             {body}
           </section>
+        </div>
         </div>
       </div>
     </div>

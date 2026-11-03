@@ -54,7 +54,7 @@ export function CheckoutDemoPage() {
         <button className="btn btn-primary h-9 text-sm" onClick={() => setFull(true)} disabled={!valid}><Maximize2 className="h-4 w-4" />Fullscreen preview</button>
       </>}
     >
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,35fr)_minmax(0,65fr)]">
         <div className="min-w-0"><CheckoutConfiguration cfg={cfg} onChange={setCfg} /></div>
         <div className="min-w-0">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -72,7 +72,7 @@ export function CheckoutDemoPage() {
             </div>
           </div>
 
-          <div className="rounded-2xl border bg-muted/60 p-3 sm:p-5">
+          <div className="rounded-2xl border bg-muted/60 p-2.5 sm:p-3">
             {device === "desktop" ? (
               <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
                 <div className="flex items-center gap-2 border-b bg-muted/70 px-3 py-2">
@@ -103,7 +103,7 @@ export function CheckoutDemoPage() {
 
       {full && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-background" role="dialog" aria-modal="true" aria-label="Fullscreen checkout preview">
-          {checkout("hosted", () => setFull(false), "min-h-full")}
+          {checkout("hosted", () => setFull(false), "min-h-screen")}
         </div>
       )}
     </DashboardPage>

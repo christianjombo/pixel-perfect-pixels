@@ -99,7 +99,7 @@ export function MpesaPaymentForm({ engine, session, country }: FlowProps) {
 
   if (session.status === "INITIATING") return <Spinner label="Contacting M-PESA…" />;
   if (session.status === "AWAITING_AUTHORIZATION" && att) {
-    return <DeviceApproval title="Check your phone" detail={`M-PESA prompt sent to ${att.summary?.replace("M-PESA ", "") ?? "your phone"}`}
+    return <DeviceApproval title="Check your phone" detail={`M-PESA prompt sent to ${att.summary ?? "your phone"}`}
       steps={[`An M-PESA prompt shows ${amountOf(session)} to ${session.merchantName}.`, "Enter your M-PESA PIN on your phone. Griv will never ask for it.", "Wait here while we confirm."]}
       approveLabel="Enter PIN on phone" expiresAt={twoMinutesAfter(att.updatedAt)}
       onApprove={() => engine.complete()} onReject={() => engine.failAuth("You declined the M-PESA request (simulated).")}
@@ -128,8 +128,8 @@ export function MpesaPaymentForm({ engine, session, country }: FlowProps) {
   return (
     <form onSubmit={(e) => {
       e.preventDefault(); setTried(true);
-      if (mode === "mpesa_till") return void engine.initiate({ providerId: "mpesa_till", summary: "M-PESA Till" });
-      if (!phoneErr) void engine.initiate({ providerId: "mpesa_stk", summary: `M-PESA ${maskPhone(country.code, phone)}` });
+      if (mode === "mpesa_till") return void engine.initiate({ providerId: "mpesa_till", summary: "Till number" });
+      if (!phoneErr) void engine.initiate({ providerId: "mpesa_stk", summary: maskPhone(country.code, phone) });
     }} noValidate>
       <div className="mb-3 grid grid-cols-2 gap-1 rounded-lg bg-muted p-1" role="radiogroup" aria-label="M-PESA option">
         {(["mpesa_stk", "mpesa_till"] as const).map((m) => (
