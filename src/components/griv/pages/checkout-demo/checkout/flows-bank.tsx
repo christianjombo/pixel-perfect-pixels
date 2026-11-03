@@ -45,7 +45,7 @@ export function CardPaymentForm({ engine, session, country }: FlowProps) {
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
   const [holder, setHolder] = useState("");
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [touched, setTouched] = useState<Partial<Record<"n" | "e" | "c" | "h", boolean>>>({});
   const att = engine.attempt;
   const providers = channelProviders(country.code, "card");
   const v = validateCard({ number, expiry, cvv }, new Date());

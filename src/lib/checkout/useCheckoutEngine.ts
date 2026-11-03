@@ -176,7 +176,8 @@ export function useCheckoutEngine(input: SessionInput, opts: EngineOptions) {
     callback,
     transferNotice,
     duplicateCallback,
-    submitAuth: (data: Parameters<CheckoutAdapter["submitAuthorization"]>[1]) => (ref.current ? adapter.submitAuthorization(ref.current, data) : Promise.resolve({ accepted: false })),
+    submitAuth: (data: Parameters<CheckoutAdapter["submitAuthorization"]>[1]): Promise<{ accepted: boolean; error?: string }> =>
+      (ref.current ? adapter.submitAuthorization(ref.current, data) : Promise.resolve({ accepted: false })),
     expire: () => { if (dispatch({ type: "EXPIRE" })?.status === "EXPIRED") clear(); },
     cancel: (reason?: string) => { if (dispatch({ type: "CANCEL", ...(reason ? { reason } : {}) })?.status === "CANCELLED") clear(); },
     retry: (needsDetails: boolean) => dispatch({ type: "RETRY", needsDetails }),

@@ -46,7 +46,7 @@ export function Countdown({ to, onEnd, label = "Expires in" }: { to: string; onE
 
 /** One-time code entry. Only demo codes are accepted; real codes must never be typed here. */
 export function CodeStep({ title, description, label = "One-time code", length = 6, demoHint = `Use ${DEMO_OTP} in this demo.`, maxTries = 3, onSubmit, onTooMany, onCancel, submitLabel = "Confirm" }: {
-  title: string; description?: ReactNode; label?: string; length?: number; demoHint?: string; maxTries?: number;
+  title: string; description?: ReactNode; label?: string; length?: number; demoHint?: string | undefined; maxTries?: number;
   onSubmit: (code: string) => Promise<string | null>; onTooMany: () => void; onCancel?: () => void; submitLabel?: string;
 }) {
   const id = useId();
