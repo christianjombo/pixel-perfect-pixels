@@ -46,7 +46,7 @@ export function CheckoutConfiguration({ cfg, onChange }: { cfg: DemoConfig; onCh
         <Section title="Merchant">
           <div className="flex items-center justify-between rounded-lg bg-muted px-3 py-2"><MerchantIdentity name={cfg.merchantName} size="sm" /><span className="text-xs text-muted-foreground">Logo preview</span></div>
           <F label="Display name" error={errors.merchantName}>{(id) => <input id={id} className={input} value={cfg.merchantName} onChange={(e) => set("merchantName", e.target.value)} />}</F>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2">
             <F label="Support email" error={errors.merchantEmail}>{(id) => <input id={id} type="email" className={input} value={cfg.merchantEmail} onChange={(e) => set("merchantEmail", e.target.value)} />}</F>
             <F label="Merchant reference">{(id) => <input id={id} className={input} value={cfg.merchantRef} onChange={(e) => set("merchantRef", e.target.value)} />}</F>
           </div>
@@ -71,14 +71,14 @@ export function CheckoutConfiguration({ cfg, onChange }: { cfg: DemoConfig; onCh
             </F>
           </div>
           <F label="Description">{(id) => <input id={id} className={input} value={cfg.description} onChange={(e) => set("description", e.target.value)} />}</F>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2">
             <F label="Customer name">{(id) => <input id={id} className={input} value={cfg.customerName} onChange={(e) => set("customerName", e.target.value)} />}</F>
             <F label="Customer email" error={errors.customerEmail}>{(id) => <input id={id} type="email" className={input} value={cfg.customerEmail} onChange={(e) => set("customerEmail", e.target.value)} />}</F>
           </div>
           <F label={`Customer phone (${country.dialCode})`} optional hint={`Pre-fills phone-based methods. Example: ${country.phone.example}`}>
             {(id) => <input id={id} type="tel" className={input} value={cfg.customerPhone} placeholder={country.phone.example} onChange={(e) => set("customerPhone", e.target.value)} />}
           </F>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2">
             <F label="Transaction reference" optional hint="Leave empty to generate one.">{(id) => <input id={id} className={input} value={cfg.txnRef} onChange={(e) => set("txnRef", e.target.value)} />}</F>
             <F label="Order reference" optional>{(id) => <input id={id} className={input} value={cfg.orderRef} onChange={(e) => set("orderRef", e.target.value)} />}</F>
           </div>
@@ -129,7 +129,7 @@ export function CheckoutConfiguration({ cfg, onChange }: { cfg: DemoConfig; onCh
             <p className="mb-2 flex justify-between text-xs font-medium"><span>Processing delay</span><span className="tnum text-muted-foreground">{cfg.delaySec.toFixed(1)}s</span></p>
             <Slider min={0.5} max={8} step={0.5} value={[cfg.delaySec]} onValueChange={(v) => set("delaySec", v[0] ?? 2)} aria-label="Processing delay in seconds" />
           </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1 2xl:grid-cols-2">
             <F label="Payment window" hint="Transfer, USSD and QR countdown.">
               {(id) => (
                 <select id={id} className={input} value={cfg.windowMinutes} onChange={(e) => set("windowMinutes", Number(e.target.value))}>

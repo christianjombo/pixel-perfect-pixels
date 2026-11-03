@@ -74,8 +74,8 @@ export function PaymentStatus({ session, engine, onClose, merchantEmail }: { ses
           ))}
         </dl>
         {rec && rec.outcome === "matched" && <p className="mt-2 text-xs text-muted-foreground">Reconciliation: {rec.note}</p>}
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <button className="btn btn-outline h-10" onClick={() => setReceipt(true)}><ReceiptIcon className="h-4 w-4" />View receipt</button>
+        <div className="mt-4 grid gap-2 @[30rem]:grid-cols-2">
+          <button className="btn btn-outline h-10 whitespace-nowrap" onClick={() => setReceipt(true)}><ReceiptIcon className="h-4 w-4" />View receipt</button>
           <button className="btn btn-primary h-10" onClick={() => (onClose ? onClose() : void engine.restart())}>{onClose ? "Close checkout" : "Done"}</button>
         </div>
         <Dialog open={receipt} onOpenChange={setReceipt}>
