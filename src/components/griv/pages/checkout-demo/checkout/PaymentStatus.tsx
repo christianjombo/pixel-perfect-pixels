@@ -70,7 +70,7 @@ export function PaymentStatus({ session, engine, onClose, merchantEmail }: { ses
         <Heading sub={<span className="inline-flex items-center gap-1.5">{amount} paid to {session.merchantName} <DemoTag>Simulated</DemoTag></span>}>Payment successful</Heading>
         <dl className="mt-5 divide-y rounded-lg border text-sm">
           {[["Amount", amount], ["Merchant", session.merchantName], ["Method", att?.summary ? `${method} · ${att.summary}` : method], ["Reference", att?.reference ?? ""], ["Date", fmtDate(session.completedAt ?? session.updatedAt)]].map(([k, v]) => (
-            <div key={k} className="flex justify-between gap-3 px-3 py-2"><dt className="text-muted-foreground">{k}</dt><dd className="min-w-0 break-all text-right font-medium">{v}</dd></div>
+            <div key={k} className="flex justify-between gap-3 px-3 py-2"><dt className="shrink-0 text-muted-foreground">{k}</dt><dd className="min-w-0 break-words text-right font-medium">{v}</dd></div>
           ))}
         </dl>
         {rec && rec.outcome === "matched" && <p className="mt-2 text-xs text-muted-foreground">Reconciliation: {rec.note}</p>}
