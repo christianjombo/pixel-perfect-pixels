@@ -96,7 +96,8 @@ describe("input validation", () => {
 /* ---------- state machine ---------- */
 let n = 0;
 const t = () => new Date(Date.UTC(2026, 10, 3, 12, 0, n++)).toISOString();
-const run = (s: CheckoutSession, ...actions: Omit<CheckoutAction, "now" | "eventId">[]) =>
+type ActionInput = CheckoutAction extends infer A ? (A extends unknown ? Omit<A, "now" | "eventId"> : never) : never;
+const run = (s: CheckoutSession, ...actions: ActionInput[]) =>
   actions.reduce((acc, a) => checkoutReducer(acc, { ...a, now: t(), eventId: `e${n}` } as CheckoutAction), s);
 const fresh = () => run(createSession({
   merchantId: "m1", merchantName: "Acme", country: "NG", currency: "NGN", amountMinor: 100000, description: "",
