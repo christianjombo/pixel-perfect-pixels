@@ -4,7 +4,7 @@ import {
   BRAND_LABEL, TEST_CARDS, cardBehaviour, detectBrand, formatCardNumber, formatExpiry, last4, validateCard, type CardBrand,
 } from "@/lib/checkout/card";
 import type { CheckoutSession } from "@/lib/checkout/machine";
-import { formatMinor } from "@/lib/checkout/money";
+import { formatMinor, minorToInput } from "@/lib/checkout/money";
 import { type Country, type DeviceId, channelProviders } from "@/lib/checkout/registry";
 import type { CheckoutEngine } from "@/lib/checkout/useCheckoutEngine";
 import { cn } from "@/lib/utils";
@@ -159,7 +159,7 @@ export function BankTransferInstructions({ engine, session }: FlowProps) {
           <CopyRow label="Bank" value={att.provider} />
           <CopyRow label="Account name" value={`Griv Demo / ${session.merchantName}`} />
           <CopyRow label="Account number" value={acct} mono display={<span className="flex items-center gap-2">{acct}<DemoTag>Not a real account</DemoTag></span>} />
-          <CopyRow label="Exact amount" value={String(session.amountMinor / 100)} display={amountOf(session)} />
+          <CopyRow label="Exact amount" value={minorToInput(session.amountMinor, session.currency)} display={amountOf(session)} />
           <CopyRow label="Reference" value={att.reference} mono />
         </div>
         <p className="mt-3 flex items-center gap-2 text-xs text-muted-foreground" role="status"><span className="h-2 w-2 animate-pulse rounded-full bg-warning motion-reduce:animate-none" />Waiting for your transfer…</p>

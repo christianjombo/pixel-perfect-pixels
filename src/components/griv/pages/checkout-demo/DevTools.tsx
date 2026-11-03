@@ -25,7 +25,7 @@ export function DevTools({ engine }: { engine: CheckoutEngine }) {
   const hook = webhookPayload(s);
   const st = s.status;
   const controls = [
-    { label: "Simulate success", ok: !!att && canTransition(st, "SUCCEEDED") || (!!att && st === "PROCESSING"), run: () => engine.callback("succeeded") },
+    { label: "Simulate success", ok: !!att && canTransition(st, "SUCCEEDED"), run: () => engine.callback("succeeded") },
     { label: "Simulate failure", ok: !!att && canTransition(st, "FAILED"), run: () => engine.callback("failed", { reason: "Failed from developer tools (simulated)." }) },
     { label: "Simulate pending", ok: !!att && st !== "PENDING" && canTransition(st, "PENDING"), run: () => engine.callback("pending") },
     { label: "Simulate expiry", ok: canTransition(st, "EXPIRED"), run: () => engine.expire() },

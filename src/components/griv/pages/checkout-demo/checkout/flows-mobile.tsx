@@ -1,6 +1,7 @@
 import { useEffect, useId, useState } from "react";
 import { Building2, Lock } from "lucide-react";
 import { CAPITEC_IDENTIFIERS, EFT_DEMO_BANKS, channelProviders, getEntry, maskPhone, validatePhone, DEVICES } from "@/lib/checkout/registry";
+import { minorToInput } from "@/lib/checkout/money";
 import { CodeStep, CopyRow, DemoActions, DeviceApproval, StepTitle, WalletSheet, demoBtn } from "./auth";
 import { type FlowProps, FieldBox, ProviderSelect, amountOf } from "./flows-bank";
 import { AvailabilityBadge, DemoTag, Spinner } from "./parts";
@@ -116,7 +117,7 @@ export function MpesaPaymentForm({ engine, session, country }: FlowProps) {
         </ol>
         <div className="divide-y rounded-lg border px-3">
           <CopyRow label="Till number" value="000000" mono display={<span className="flex items-center gap-2">000 000<DemoTag>Demo till</DemoTag></span>} />
-          <CopyRow label="Amount" value={String(session.amountMinor / 100)} display={amountOf(session)} />
+          <CopyRow label="Amount" value={minorToInput(session.amountMinor, session.currency)} display={amountOf(session)} />
           <CopyRow label="Reference" value={att.reference} mono />
         </div>
         <button className="btn btn-primary mt-3 h-11 w-full" onClick={() => engine.complete()}>I've paid</button>
