@@ -10,13 +10,13 @@ import { Logo, LogoMark } from "./Logo";
 type NavTo =
   | "/dashboard" | "/balances" | "/balances-old" | "/transactions" | "/transfers" | "/payouts"
   | "/payment-links" | "/invoices" | "/virtual-accounts" | "/payments"
-  | "/online-store" | "/orders" | "/products" | "/inventory" | "/pos" | "/merchant-groups" | "/settings";
+  | "/online-store" | "/orders" | "/products" | "/inventory" | "/pos" | "/merchant-groups" | "/settings" | "/checkout-demo";
 type Item = { label: string; icon: typeof Wallet; to?: NavTo; settings?: string };
 type Accordion = { label: string; icon: typeof Wallet; children: { label: string; to?: NavTo }[] };
 const NAV: { group?: string; items?: Item[]; accordions?: Accordion[] }[] = [
   { items: [{ label: "Home", icon: LayoutDashboard, to: "/dashboard" }, { label: "Balances", icon: Wallet, to: "/balances" }, { label: "Cards", icon: CreditCard }, { label: "Transactions", icon: ArrowLeftRight, to: "/transactions" }] },
   { group: "Products", accordions: [
-    { label: "Payments", icon: Banknote, children: [{ label: "Payment Links", to: "/payment-links" }, { label: "Invoices", to: "/invoices" }, { label: "Virtual Accounts", to: "/virtual-accounts" }, { label: "Transfer", to: "/transfers" }] },
+    { label: "Payments", icon: Banknote, children: [{ label: "Payment Links", to: "/payment-links" }, { label: "Invoices", to: "/invoices" }, { label: "Virtual Accounts", to: "/virtual-accounts" }, { label: "Transfer", to: "/transfers" }, { label: "Checkout Demo", to: "/checkout-demo" }] },
     { label: "Reporting", icon: BarChart3, children: [{ label: "Reports" }] },
     { label: "Marketplace", icon: ShoppingCart, children: [
       { label: "Online Store", to: "/online-store" }, { label: "Orders", to: "/orders" }, { label: "Products", to: "/products" },
