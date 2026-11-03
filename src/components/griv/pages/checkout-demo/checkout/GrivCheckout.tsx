@@ -28,7 +28,7 @@ export type CheckoutMode = "hosted" | "modal" | "embedded";
  * component later. Layout responds to its own width (container queries), not the window.
  */
 export function GrivCheckout({ engine, ctx, merchantEmail, mode = "embedded", onClose, className }: {
-  engine: CheckoutEngine; ctx: EligibilityContext; merchantEmail: string; mode?: CheckoutMode; onClose?: (() => void) | undefined; className?: string;
+  engine: CheckoutEngine; ctx: EligibilityContext; merchantEmail: string; mode?: CheckoutMode; onClose?: (() => void) | undefined; className?: string | undefined;
 }) {
   const s = engine.session;
   const panel = useRef<HTMLDivElement>(null);
