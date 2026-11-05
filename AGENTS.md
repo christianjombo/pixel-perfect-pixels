@@ -27,3 +27,4 @@
 - Brand logos are real PNG files in `public/brand/` referenced by absolute path (not `.asset.json` CDN pointers), because the app is also deployed to Vercel, which cannot serve Lovable CDN asset URLs.
 
 - Subdirectories may have their own `AGENTS.md` (e.g. `src/components/griv/settings/`); read it before changing files there.
+- Cards, suppliers and credit use in-memory stores in `src/lib/demo/business-pages.ts`; customer management reuses `customersStore`, and Insights/AI derive currency-scoped collections from the shared ledger so views stay consistent. Card issuance and credit applications stay pending; AI is a labelled local rule-based demo until real services are explicitly connected.

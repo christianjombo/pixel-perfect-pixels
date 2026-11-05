@@ -10,20 +10,21 @@ import { Logo, LogoMark } from "./Logo";
 type NavTo =
   | "/dashboard" | "/balances" | "/balances-old" | "/transactions" | "/transfers" | "/payouts"
   | "/payment-links" | "/invoices" | "/virtual-accounts" | "/payments"
-  | "/online-store" | "/orders" | "/products" | "/inventory" | "/pos" | "/merchant-groups" | "/settings" | "/checkout-demo";
+  | "/online-store" | "/orders" | "/products" | "/inventory" | "/pos" | "/merchant-groups" | "/settings" | "/checkout-demo"
+  | "/cards" | "/customers" | "/suppliers" | "/ai" | "/credit" | "/insights";
 type Item = { label: string; icon: typeof Wallet; to?: NavTo; settings?: string };
 type Accordion = { label: string; icon: typeof Wallet; children: { label: string; to?: NavTo }[] };
 const NAV: { group?: string; items?: Item[]; accordions?: Accordion[] }[] = [
-  { items: [{ label: "Home", icon: LayoutDashboard, to: "/dashboard" }, { label: "Balances", icon: Wallet, to: "/balances" }, { label: "Cards", icon: CreditCard }, { label: "Transactions", icon: ArrowLeftRight, to: "/transactions" }] },
+  { items: [{ label: "Home", icon: LayoutDashboard, to: "/dashboard" }, { label: "Balances", icon: Wallet, to: "/balances" }, { label: "Cards", icon: CreditCard, to: "/cards" }, { label: "Transactions", icon: ArrowLeftRight, to: "/transactions" }] },
   { group: "Products", accordions: [
     { label: "Payments", icon: Banknote, children: [{ label: "Payment Links", to: "/payment-links" }, { label: "Invoices", to: "/invoices" }, { label: "Virtual Accounts", to: "/virtual-accounts" }, { label: "Transfer", to: "/transfers" }, { label: "Checkout Demo", to: "/checkout-demo" }] },
     { label: "Reporting", icon: BarChart3, children: [{ label: "Reports" }] },
     { label: "Marketplace", icon: ShoppingCart, children: [
       { label: "Online Store", to: "/online-store" }, { label: "Orders", to: "/orders" }, { label: "Products", to: "/products" },
-      { label: "Inventory", to: "/inventory" }, { label: "POS", to: "/pos" }, { label: "Customers" }, { label: "Suppliers" },
+      { label: "Inventory", to: "/inventory" }, { label: "POS", to: "/pos" }, { label: "Customers", to: "/customers" }, { label: "Suppliers", to: "/suppliers" },
     ] },
   ] },
-  { group: "Grow", items: [{ label: "Insights", icon: LineChart }, { label: "Credit", icon: Sparkles }, { label: "AI", icon: Bot }] },
+  { group: "Grow", items: [{ label: "Insights", icon: LineChart, to: "/insights" }, { label: "Credit", icon: Sparkles, to: "/credit" }, { label: "AI", icon: Bot, to: "/ai" }] },
   { group: "Settings", items: [{ label: "Settings", icon: Settings, to: "/settings" }, { label: "Developers", icon: Code2, settings: "api-keys" }] },
   { group: "Previews", items: [{ label: "Merchant Groups", icon: LayoutTemplate, to: "/merchant-groups" }] },
   { group: "Trashed", items: [{ label: "Balances (old)", icon: Trash2, to: "/balances-old" }] },
