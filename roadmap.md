@@ -114,3 +114,11 @@
 - [x] Configuration panel, desktop/mobile/fullscreen/modal previews
 - [x] Developer tools: timeline, session inspector, webhook JSON, simulation controls
 - [x] Tests + browser checks
+
+## Cards, contacts and growth pages
+- [ ] Cards: list, details, controls and pending demo requests
+- [ ] Customers and Suppliers: searchable directories, create/edit and details
+- [ ] Insights: currency-safe analytics from the shared ledger
+- [ ] Credit: applications and pending-only requests, no fabricated offers
+- [ ] AI: clearly labelled local demo answers from shared business data
+- [ ] Navigation, rules tests and desktop/mobile browser verification
