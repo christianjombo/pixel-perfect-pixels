@@ -116,9 +116,9 @@
 - [x] Tests + browser checks
 
 ## Cards, contacts and growth pages
-- [ ] Cards: list, details, controls and pending demo requests
-- [ ] Customers and Suppliers: searchable directories, create/edit and details
-- [ ] Insights: currency-safe analytics from the shared ledger
-- [ ] Credit: applications and pending-only requests, no fabricated offers
-- [ ] AI: clearly labelled local demo answers from shared business data
-- [ ] Navigation, rules tests and desktop/mobile browser verification
+- [x] Cards: list, details, controls and pending demo requests
+- [x] Customers and Suppliers: searchable directories, create/edit and details
+- [x] Insights: currency-safe analytics from the shared ledger
+- [x] Credit: applications and pending-only requests, no fabricated offers
+- [x] AI: clearly labelled local demo answers from shared business data
+- [x] Navigation, rules tests and desktop/mobile browser verification (150 tests pass; six page workflows checked, no browser errors)
