@@ -38,7 +38,7 @@ export function periodWindow(period: Period, zone = 'Africa/Lagos', custom?: Win
     case 'Custom range': return custom && validWindow(custom) ? custom : { from: shiftDay(to, -29), to };
   }
 }
-export function validWindow(w: Window) { return /^\d{4}-\d{2}-\d{2}$/.test(w.from) && /^\d{4}-\d{2}-\d{2}$/.test(w.to) && Number.isFinite(Date.parse(w.from)) && Number.isFinite(Date.parse(w.to)) && w.from <= w.to && (Date.parse(w.to) - Date.parse(w.from)) / 86400000 <= 730; }
+export function validWindow(w: Window) { return /^\d{4}-\d{2}-\d{2}$/.test(w.from) && /^\d{4}-\d{2}-\d{2}$/.test(w.to) && Number.isFinite(Date.parse(w.from)) && Number.isFinite(Date.parse(w.to)) && new Date(w.from).toISOString().slice(0, 10) === w.from && new Date(w.to).toISOString().slice(0, 10) === w.to && w.from <= w.to && (Date.parse(w.to) - Date.parse(w.from)) / 86400000 <= 730; }
 export function previousWindow(w: Window): Window { const length = Math.round((Date.parse(w.to) - Date.parse(w.from)) / 86400000) + 1; return { from: shiftDay(w.from, -length), to: shiftDay(w.from, -1) }; }
 export function change(current: number, previous: number, rate = false) { return rate ? current - previous : previous === 0 ? null : (current - previous) / previous * 100; }
 export const sum = <T,>(rows: T[], value: (r: T) => number) => Math.round(rows.reduce((s, r) => s + value(r), 0) * 100) / 100;
@@ -64,9 +64,9 @@ export function tabFinancial(rows: UnifiedTxn[], f: AnalyticsFilters, tab: Insig
     && (tab !== 'Transfers' || (['Transfer', 'Payout'].includes(r.type) && (f.transferKind === 'All' || (f.transferKind === 'Internal' ? r.type === 'Transfer' : f.transferKind === 'External' ? r.type === 'Payout' : r.status === 'Scheduled'))))
     && (tab !== 'Settlements' || r.type === 'Settlement'));
 }
-export function breakdown(rows: UnifiedTxn[], key: (r: UnifiedTxn) => string): Breakdown[] {
-  const total = sum(rows.filter(success), r => r.amount);
-  return [...new Set(rows.map(key))].map(name => { const subset = rows.filter(r => key(r) === name); const paid = subset.filter(success); const amount = sum(paid, r => r.amount); return { name, count: subset.length, amount, rate: rate(subset), average: paid.length ? amount / paid.length : 0, share: total ? amount / total * 100 : 0, refs: subset.map(r => r.id) }; }).sort((a, b) => b.amount - a.amount || b.count - a.count);
+export function breakdown(rows: UnifiedTxn[], key: (r: UnifiedTxn) => string, confirmedOnly = true): Breakdown[] {
+  const total = sum(confirmedOnly ? rows.filter(success) : rows, r => r.amount);
+  return [...new Set(rows.map(key))].map(name => { const subset = rows.filter(r => key(r) === name); const paid = confirmedOnly ? subset.filter(success) : subset; const amount = sum(paid, r => r.amount); return { name, count: subset.length, amount, rate: rate(subset), average: paid.length ? amount / paid.length : 0, share: total ? amount / total * 100 : 0, refs: subset.map(r => r.id) }; }).sort((a, b) => b.amount - a.amount || b.count - a.count);
 }
 export function financeMetrics(rows: UnifiedTxn[], tab: InsightTab): Metric[] {
   const paid = rows.filter(r => r.type === 'Payment' && r.payinType !== 'Funding'); const collected = paid.filter(success); const volume = sum(collected, r => r.amount); const fees = sum(collected, r => r.fee);
