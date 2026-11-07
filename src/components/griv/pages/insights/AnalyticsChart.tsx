@@ -1,0 +1,22 @@
+import { useState } from 'react';
+import { BarChart3, ChartLine } from 'lucide-react';
+import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis, Brush } from 'recharts';
+import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/griv/kit';
+import { formatMoney, formatMoneyCompact, type Currency } from '@/lib/money';
+import type { Point, SeriesMetric } from '@/lib/demo/insights';
+export function AnalyticsChart({ title, data, currency, count = false, compare, metric, options, onMetric, aggregation, onAggregation, loading = false }: { title: string; data: Point[]; currency: Currency; count?: boolean; compare: boolean; metric: SeriesMetric; options: SeriesMetric[]; onMetric: (metric: SeriesMetric) => void; aggregation: 'Daily' | 'Weekly' | 'Monthly'; onAggregation: (value: 'Daily' | 'Weekly' | 'Monthly') => void; loading?: boolean }) {
+  const [bars, setBars] = useState(false);
+  const format = (value: number) => count ? value.toLocaleString('en-NG', { maximumFractionDigits: 0 }) : formatMoneyCompact(value, currency);
+  return <section className="min-w-0 border-y py-5">
+    <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><h2 className="text-base font-semibold">{title}</h2><div className="flex flex-wrap items-center gap-2">
+      <select className="field h-9 w-auto max-w-full text-sm" aria-label={`${title} metric`} value={metric} onChange={e => onMetric(e.target.value as SeriesMetric)}>{options.map(o => <option key={o}>{o}</option>)}</select>
+      <select className="field h-9 w-auto text-sm" aria-label={`${title} aggregation`} value={aggregation} onChange={e => onAggregation(e.target.value as 'Daily' | 'Weekly' | 'Monthly')}>{['Daily', 'Weekly', 'Monthly'].map(o => <option key={o}>{o}</option>)}</select>
+      <div className="flex border rounded-md"><Button variant="ghost" size="icon" aria-label="Line chart" title="Line chart" aria-pressed={!bars} className={!bars ? 'bg-accent text-primary' : ''} onClick={() => setBars(false)}><ChartLine /></Button><Button variant="ghost" size="icon" aria-label="Bar chart" title="Bar chart" aria-pressed={bars} className={bars ? 'bg-accent text-primary' : ''} onClick={() => setBars(true)}><BarChart3 /></Button></div>
+    </div></div>
+    {loading ? <div className="h-72 animate-pulse bg-muted" role="status">Loading analytics…</div> : !data.some(d => d.value || (compare && d.previous)) ? <EmptyState title="No activity in this period" description="Try another date range or clear your filters." /> : <>
+      <div className="mb-3 flex flex-wrap gap-5 text-xs text-muted-foreground"><span className="flex items-center gap-2"><span className="h-2 w-5 bg-chart-1" />Current period: {format(data.reduce((s, d) => s + d.value, 0))}</span>{compare && <span className="flex items-center gap-2"><span className="h-0 w-5 border-t-2 border-dashed border-chart-5" />Previous period: {format(data.reduce((s, d) => s + d.previous, 0))}</span>}</div>
+      <div className="h-80 w-full" role="img" aria-label={`${title}: ${metric}, ${count ? 'count' : currency}, ${aggregation.toLowerCase()} totals`}><ResponsiveContainer width="100%" height="100%"><ComposedChart data={data} margin={{ left: 5, right: 15, top: 10, bottom: 5 }} accessibilityLayer><CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="3 3" /><XAxis dataKey="key" tick={{ fill: 'var(--muted-foreground)', fontSize: 11 }} minTickGap={40} tickLine={false} axisLine={false} /><YAxis width={65} tickFormatter={format} tick={{ fill: 'var(--muted-foreground)', fontSize: 11 }} axisLine={false} tickLine={false} /><Tooltip contentStyle={{ background: 'var(--popover)', borderColor: 'var(--border)', borderRadius: 6, color: 'var(--popover-foreground)' }} formatter={(v: number, name: string) => [count ? v.toLocaleString() : formatMoney(v, currency), name === 'previous' ? 'Previous period (aligned)' : metric]} />{bars ? <Bar dataKey="value" fill="var(--chart-1)" radius={[3, 3, 0, 0]} isAnimationActive={false} /> : <Line dataKey="value" stroke="var(--chart-1)" strokeWidth={2} dot={false} isAnimationActive={false} />}{compare && <Line dataKey="previous" stroke="var(--chart-5)" strokeDasharray="5 5" strokeWidth={2} dot={false} isAnimationActive={false} />}{data.length > 14 && <Brush dataKey="key" height={20} stroke="var(--border)" fill="var(--muted)" travellerWidth={7} />}</ComposedChart></ResponsiveContainer></div>
+    </>}
+  </section>;
+}
