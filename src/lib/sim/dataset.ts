@@ -157,10 +157,12 @@ function makeCustomers(rng: Rng, count: number): Customer[] {
   let i = out.length;
   while (out.length < count) {
     const isOrg = chance(rng, 0.22);
-    const name = isOrg
+    let name = isOrg
       ? `${pick(rng, ORG_A)} ${pick(rng, ORG_B)}`
       : `${pick(rng, FIRST)} ${pick(rng, LAST)}`;
-    if (used.has(name)) continue;
+    // Name pools are finite; disambiguate duplicates with a branch/unit suffix.
+    let n = 2;
+    while (used.has(name)) name = `${isOrg ? `${pick(rng, ORG_A)} ${pick(rng, ORG_B)}` : `${pick(rng, FIRST)} ${pick(rng, LAST)}`} ${isOrg ? `(${n++})` : String.fromCharCode(64 + n++) + "."}`;
     used.add(name);
     const [city, country] = pick(rng, CITIES);
     const slug = name.toLowerCase().replace(/[^a-z]+/g, ".").replace(/^\.|\.$/g, "");
@@ -305,7 +307,7 @@ export function generateDataset(env: SimEnv): SimDataset {
       sourceChannel: "Dashboard",
       accountId: parent.accountId,
       parentId: parent.id,
-      customerId: parent.customerId,
+      ...(parent.customerId ? { customerId: parent.customerId } : {}),
     });
   }
   // Monthly processing-fee rows per account.
@@ -418,10 +420,19 @@ export function generateDataset(env: SimEnv): SimDataset {
   const NICKNAMES = ["Business expenses", "Marketing spend", "Logistics", "Travel", "Office supplies", "Software subscriptions", "Fuel", "Procurement"];
   let cardRef = 900000;
   for (let i = 0; i < scale.cards; i++) {
-    const currency = weighted(rng, [["NGN", 85], ["USD", 15]] as const);
+    const currency = weighted(rng, [["NGN", 82], ["USD", 9], ["GHS", 3], ["KES", 3], ["ZAR", 3]] as const);
     const holder = pick(rng, TEAM);
-    const createdDay = int(rng, 60, 400);
-    const status: DemoCardFull["status"] = chance(rng, 0.08) ? "Paused" : chance(rng, 0.05) ? "Terminated" : chance(rng, 0.04) ? "Pending" : "Active";
+    // Include recently issued cards so the Cards page's default "Last 30 days" view isn't empty.
+    const createdDay = int(rng, 0, 400);
+    const status: DemoCardFull["status"] = chance(rng, 0.08)
+      ? "Paused"
+      : chance(rng, 0.05)
+        ? "Terminated"
+        : chance(rng, 0.04)
+          ? "Pending"
+          : chance(rng, 0.04)
+            ? "Expired"
+            : "Active";
     const id = seqId("card", i, 4);
     const perTxn = currency === "NGN" ? int(rng, 50000, 500000) : int(rng, 100, 2000);
     const cardObj: DemoCardFull = {
@@ -445,7 +456,7 @@ export function generateDataset(env: SimEnv): SimDataset {
       providerRef: `iss_${id.slice(5)}`,
       issueRef: `TXN-ISS-${cardRef++}`,
       fundingModel: "Prefunded",
-      fundingSource: currency === "NGN" ? "NGN business balance" : "USD business balance",
+      fundingSource: `${currency} business balance`,
       limits: { perTransaction: perTxn, daily: perTxn * 3, monthly: perTxn * 12 },
       restrictions: { categories: [], countries: [], channels: ["Online", "In-store", "ATM"] },
       autoFunding: { enabled: false, threshold: 0, topUp: 0, source: "", maxPerTopUp: 0, dailyCap: 0, monthlyCap: 0, minIntervalHours: 24 },
@@ -517,6 +528,20 @@ export function generateDataset(env: SimEnv): SimDataset {
       cardObj.terminatedAt = daysAgo(int(rng, 5, 50), 12, 0);
       cardObj.terminatedBy = "Ada Okafor";
       cardObj.terminateReason = "Card no longer needed";
+    }
+    // ~12% of active cards have an automatic top-up rule configured.
+    if (status === "Active" && chance(rng, 0.12)) {
+      const topUp = currency === "NGN" ? int(rng, 50000, 300000) : int(rng, 50, 500);
+      cardObj.autoFunding = {
+        enabled: true,
+        threshold: Math.round(topUp / 2),
+        topUp,
+        source: cardObj.fundingSource,
+        maxPerTopUp: topUp,
+        dailyCap: topUp,
+        monthlyCap: topUp * 3,
+        minIntervalHours: 24,
+      };
     }
     cards.push(cardObj);
     cardActivity.push({
