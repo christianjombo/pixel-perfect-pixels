@@ -15,11 +15,10 @@ const motionComponentCache = new Map<
 >();
 
 const getMotionComponent = (element: keyof JSX.IntrinsicElements) => {
-  let component = motionComponentCache.get(element);
-  if (!component) {
-    component = motion.create(element);
-    motionComponentCache.set(element, component);
-  }
+  const cached = motionComponentCache.get(element);
+  if (cached) return cached;
+  const component = motion.create(element);
+  motionComponentCache.set(element, component);
   return component;
 };
 

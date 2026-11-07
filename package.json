@@ -68,6 +68,7 @@
     "input-otp": "^1.4.2",
     "lucide-react": "^0.575.0",
     "motion": "^14.9.1",
+    "nanoid": "^6.0.2",
     "pdf-lib": "^1.17.1",
     "qrcode": "^1.5.4",
     "react": "^19.2.0",
