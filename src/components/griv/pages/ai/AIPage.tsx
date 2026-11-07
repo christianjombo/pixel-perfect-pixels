@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useRouterState } from '@tanstack/react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { UIMessage } from 'ai';
@@ -19,7 +19,8 @@ export function AIPage({threadId,embedded=false,onExpand}:{threadId?:string;embe
  const workspace=useQuery({queryKey:['ai-workspace'],queryFn:()=>getAIWorkspace()});
  const threads=useQuery({queryKey:['ai-threads',environment],queryFn:()=>listAIThreads({data:{environment}})});
  const thread=useQuery({queryKey:['ai-thread',threadId,environment],queryFn:()=>getAIThread({data:{threadId:threadId??'',environment}}),enabled:!!threadId});
- useEffect(()=>{setPendingPrompt('');},[environment]);
+ const envRef=useRef(environment);
+ useEffect(()=>{if(envRef.current!==environment){envRef.current=environment;setPendingPrompt('');}},[environment]);
  const consumed=useCallback(()=>setPendingPrompt(''),[]);
  const create=async(prompt='')=>{if(creating)return;setCreating(true);try{const row=await createAIThread({data:{title:'New conversation',environment,currency,period:period as 'Last 30 days'}});setPendingPrompt(prompt);void qc.invalidateQueries({queryKey:['ai-threads']});await navigate({to:'/ai/$threadId',params:{threadId:row.id}});onExpand?.();}catch(e){toast.error(e instanceof Error?e.message:'Conversation could not be created.');}finally{setCreating(false);}};
  const grouped=(threads.data??[]).filter(t=>t.title.toLowerCase().includes(search.toLowerCase()));
