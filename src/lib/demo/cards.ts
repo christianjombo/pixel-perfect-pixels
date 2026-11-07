@@ -1,8 +1,13 @@
 // SAMPLE DATA — card programme demo. No real cards, PANs, CVVs or provider calls exist here.
+// Cards, their transactions, funding records and activity come from the shared simulation
+// layer (src/lib/sim): card totals are derived from the card's own records, and completed
+// funding debits the same balance accounts the Balances page shows.
 // Money movements (funding) never reach a final success state client-side; they stay
 // "Processing" until a real issuer/ledger confirms, per the project's demo-money rule.
-import { createDemoStore, makeRef } from "@/lib/demo-store";
-import { daysAgo, nowIso } from "@/lib/dates";
+import { makeRef } from "@/lib/demo-store";
+import { createSimStore } from "@/lib/sim/store";
+import { getDataset } from "@/lib/sim/dataset";
+import { nowIso } from "@/lib/dates";
 import type { Currency } from "@/lib/money";
 
 export type CardNetwork = "Visa" | "Mastercard" | "Verve";
@@ -116,120 +121,10 @@ function card(partial: Partial<DemoCardFull> & Pick<DemoCardFull, "id" | "nickna
   };
 }
 
-const INITIAL_CARDS: DemoCardFull[] = [
-  card({ id: "card_0101", nickname: "Business expenses", holder: "Ada Okafor", last4: "2048", network: "Visa", kind: "Virtual", currency: "NGN", status: "Active", createdAt: daysAgo(210, 9), available: 412500, held: 38000, totalFunded: 2400000, totalSpent: 1945500, totalFees: 42000, limits: { perTransaction: 250000, daily: 500000, monthly: 2000000 } }),
-  card({ id: "card_0102", nickname: "Online subscriptions", holder: "Ada Okafor", last4: "8012", network: "Mastercard", kind: "Virtual", currency: "USD", status: "Paused", createdAt: daysAgo(180, 11), available: 311, totalFunded: 900, totalSpent: 589, totalFees: 12, fundingSource: "USD business balance", autoFunding: { ...NO_AUTO, enabled: true, threshold: 50, topUp: 200, source: "USD business balance", maxPerTopUp: 200, dailyCap: 200, monthlyCap: 600, minIntervalHours: 24 } }),
-  card({ id: "card_0103", nickname: "Logistics fuel card", holder: "Coastline Logistics", holderKind: "org", last4: "5541", network: "Verve", kind: "Physical", currency: "NGN", status: "Active", createdAt: daysAgo(160, 8), available: 96500, totalFunded: 800000, totalSpent: 703500, totalFees: 9500, restrictions: { categories: ["Fuel", "Tolls"], countries: ["Nigeria"], channels: ["In-store", "ATM"] } }),
-  card({ id: "card_0104", nickname: "Marketing spend", holder: "Tunde Bakare", last4: "3390", network: "Visa", kind: "Virtual", currency: "USD", status: "Active", createdAt: daysAgo(140, 14), source: "API", createdBy: "nova-ads-service (API key ••••7f2a)", available: 1240, totalFunded: 5000, totalSpent: 3760, totalFees: 55, fundingSource: "USD business balance" }),
-  card({ id: "card_0105", nickname: "Office supplies", holder: "Funmi Adeyemi", last4: "7723", network: "Mastercard", kind: "Physical", currency: "NGN", status: "Active", createdAt: daysAgo(120, 10), available: 58000, held: 12500, totalFunded: 350000, totalSpent: 279500, totalFees: 6100 }),
-  card({ id: "card_0106", nickname: "Travel & accommodation", holder: "Ada Okafor", last4: "9182", network: "Visa", kind: "Physical", currency: "NGN", status: "Active", createdAt: daysAgo(110, 16), available: 210000, totalFunded: 600000, totalSpent: 390000, totalFees: 7200 }),
-  card({ id: "card_0107", nickname: "Cloud infrastructure", holder: "nova-infra (API)", holderKind: "org", last4: "4455", network: "Mastercard", kind: "Virtual", currency: "USD", status: "Active", createdAt: daysAgo(96, 12), source: "API", createdBy: "nova-infra-service (API key ••••c41d)", available: 640, totalFunded: 3200, totalSpent: 2560, totalFees: 38, fundingSource: "USD business balance", autoFunding: { ...NO_AUTO, enabled: true, threshold: 100, topUp: 500, source: "USD business balance", maxPerTopUp: 500, dailyCap: 500, monthlyCap: 1500, minIntervalHours: 48 } }),
-  card({ id: "card_0108", nickname: "Procurement — Accra", holder: "Kofi Mensah", last4: "6208", network: "Visa", kind: "Virtual", currency: "GHS", status: "Active", createdAt: daysAgo(88, 9), available: 4200, totalFunded: 15000, totalSpent: 10800, totalFees: 210, fundingSource: "GHS business balance" }),
-  card({ id: "card_0109", nickname: "Nairobi operations", holder: "Wanjiru Njoroge", last4: "1174", network: "Mastercard", kind: "Virtual", currency: "KES", status: "Active", createdAt: daysAgo(80, 13), available: 88500, totalFunded: 400000, totalSpent: 311500, totalFees: 5200, fundingSource: "KES business balance" }),
-  card({ id: "card_0110", nickname: "Events & activations", holder: "Funmi Adeyemi", last4: "2850", network: "Verve", kind: "Physical", currency: "NGN", status: "Paused", createdAt: daysAgo(75, 15), available: 34000, totalFunded: 250000, totalSpent: 216000, totalFees: 4100 }),
-  card({ id: "card_0111", nickname: "Software tooling", holder: "Ibrahim Musa", last4: "9034", network: "Visa", kind: "Virtual", currency: "USD", status: "Active", createdAt: daysAgo(68, 10), available: 175, totalFunded: 1200, totalSpent: 1025, totalFees: 18, fundingSource: "USD business balance" }),
-  card({ id: "card_0112", nickname: "Cape Town suppliers", holder: "Pieter van Wyk", last4: "5519", network: "Mastercard", kind: "Virtual", currency: "ZAR", status: "Active", createdAt: daysAgo(60, 11), available: 9200, totalFunded: 30000, totalSpent: 20800, totalFees: 380, fundingSource: "ZAR business balance" }),
-  card({ id: "card_0113", nickname: "Petty cash — Lekki store", holder: "Nova Retail Ltd.", holderKind: "org", last4: "3367", network: "Verve", kind: "Physical", currency: "NGN", status: "Active", createdAt: daysAgo(55, 9), available: 15000, totalFunded: 120000, totalSpent: 105000, totalFees: 1800, limits: { perTransaction: 20000, daily: 50000, monthly: 150000 } }),
-  card({ id: "card_0114", nickname: "Ads — Meta & Google", holder: "Tunde Bakare", last4: "7841", network: "Visa", kind: "Virtual", currency: "USD", status: "Active", createdAt: daysAgo(48, 14), source: "API", createdBy: "nova-ads-service (API key ••••7f2a)", available: 890, held: 120, totalFunded: 4500, totalSpent: 3490, totalFees: 62, fundingSource: "USD business balance" }),
-  card({ id: "card_0115", nickname: "Team meals", holder: "Nova Retail Ltd.", holderKind: "org", last4: "2290", network: "Mastercard", kind: "Virtual", currency: "NGN", status: "Active", createdAt: daysAgo(40, 12), available: 46000, totalFunded: 150000, totalSpent: 104000, totalFees: 1500, limits: { perTransaction: 30000, daily: 60000, monthly: 200000 } }),
-  card({ id: "card_0116", nickname: "Old travel card", holder: "Ada Okafor", last4: "6013", network: "Visa", kind: "Physical", currency: "NGN", status: "Expired", createdAt: daysAgo(720, 10), available: 0, totalFunded: 900000, totalSpent: 887500, totalFees: 12500 }),
-  card({ id: "card_0117", nickname: "Q1 campaign card", holder: "Tunde Bakare", last4: "8456", network: "Mastercard", kind: "Virtual", currency: "USD", status: "Terminated", createdAt: daysAgo(300, 9), available: 0, totalFunded: 2000, totalSpent: 2000, totalFees: 30, terminatedAt: daysAgo(95, 17), terminatedBy: "Ada Okafor", terminateReason: "Campaign ended" }),
-  card({ id: "card_0118", nickname: "Former staff card", holder: "Chidi Eze", last4: "1102", network: "Verve", kind: "Physical", currency: "NGN", status: "Terminated", createdAt: daysAgo(400, 11), available: 0, totalFunded: 300000, totalSpent: 214000, totalFees: 4300, terminatedAt: daysAgo(120, 10), terminatedBy: "Ada Okafor", terminateReason: "Staff exit — remaining ₦86,000 returned to NGN balance by issuer settlement" }),
-  card({ id: "card_0119", nickname: "Pilot API card", holder: "nova-sandbox (API)", holderKind: "org", last4: "9987", network: "Visa", kind: "Virtual", currency: "USD", status: "Terminated", createdAt: daysAgo(250, 13), source: "API", createdBy: "nova-sandbox (API key ••••09be)", available: 0, totalFunded: 500, totalSpent: 480, totalFees: 8, terminatedAt: daysAgo(200, 9), terminatedBy: "nova-sandbox (API)", terminateReason: "Pilot complete" }),
-  card({ id: "card_0120", nickname: "Warehouse fuel", holder: "Ibrahim Musa", last4: "4471", network: "Verve", kind: "Physical", currency: "NGN", status: "Active", createdAt: daysAgo(30, 8), available: 72000, totalFunded: 200000, totalSpent: 128000, totalFees: 2400, restrictions: { categories: ["Fuel"], countries: ["Nigeria"], channels: ["In-store", "ATM"] } }),
-  card({ id: "card_0121", nickname: "New joiner — design", holder: "Zara Ahmed", last4: "", network: "Visa", kind: "Virtual", currency: "NGN", status: "Pending", createdAt: daysAgo(2, 10) }),
-  card({ id: "card_0122", nickname: "New joiner — engineering", holder: "Emeka Obi", last4: "", network: "Mastercard", kind: "Virtual", currency: "USD", status: "Pending", createdAt: daysAgo(1, 15), source: "API", createdBy: "nova-hr-service (API key ••••3aa1)", fundingSource: "USD business balance" }),
-  card({ id: "card_0123", nickname: "Photography shoots", holder: "Amina Bello", last4: "6630", network: "Visa", kind: "Virtual", currency: "NGN", status: "Active", createdAt: daysAgo(22, 12), available: 28500, totalFunded: 100000, totalSpent: 71500, totalFees: 1100 }),
-  card({ id: "card_0124", nickname: "Kumasi market runs", holder: "Kofi Mensah", last4: "3822", network: "Mastercard", kind: "Physical", currency: "GHS", status: "Paused", createdAt: daysAgo(18, 9), available: 1100, totalFunded: 6000, totalSpent: 4900, totalFees: 95, fundingSource: "GHS business balance" }),
-  card({ id: "card_0125", nickname: "Mombasa deliveries", holder: "Wanjiru Njoroge", last4: "7546", network: "Visa", kind: "Physical", currency: "KES", status: "Active", createdAt: daysAgo(12, 14), available: 41000, totalFunded: 150000, totalSpent: 109000, totalFees: 1900, fundingSource: "KES business balance" }),
-  card({ id: "card_0126", nickname: "Joburg client visits", holder: "Pieter van Wyk", last4: "2218", network: "Mastercard", kind: "Virtual", currency: "ZAR", status: "Active", createdAt: daysAgo(8, 11), available: 5600, totalFunded: 12000, totalSpent: 6400, totalFees: 110, fundingSource: "ZAR business balance" }),
-  card({ id: "card_0127", nickname: "Packaging samples", holder: "Funmi Adeyemi", last4: "5093", network: "Visa", kind: "Virtual", currency: "NGN", status: "Active", createdAt: daysAgo(5, 10), available: 60000, totalFunded: 80000, totalSpent: 20000, totalFees: 400 }),
-];
-
-const MERCHANTS: [string, string][] = [
-  ["Jumia Nigeria", "E-commerce"], ["Uber for Business", "Transport"], ["AWS EMEA", "Cloud services"],
-  ["Google Ads", "Advertising"], ["Meta Platforms", "Advertising"], ["Total Energies", "Fuel"],
-  ["Shoprite", "Office supplies"], ["Bolt Business", "Transport"], ["Verve Coffee Co.", "Meals"],
-  ["DHL Express", "Logistics"], ["Canva", "Software"], ["Namecheap", "Software"],
-];
-
-function txnsFor(c: DemoCardFull, count: number): CardTransaction[] {
-  if (c.status === "Pending" || !c.last4) return [];
-  const out: CardTransaction[] = [];
-  for (let i = 0; i < count; i++) {
-    const [merchant, category] = MERCHANTS[(i + c.last4.charCodeAt(0)) % MERCHANTS.length]!;
-    const day = 1 + ((i * 3 + c.last4.charCodeAt(1)) % 25);
-    const base = c.currency === "USD" ? 8 + i * 7 : c.currency === "NGN" ? 4500 + i * 3200 : 300 + i * 140;
-    const declined = i % 7 === 3;
-    const refunded = i % 9 === 5;
-    const type: CardTxnType = declined ? "Decline" : refunded ? "Refund" : i % 5 === 4 ? "Authorization" : "Capture";
-    out.push({
-      id: `ctxn_${c.id.slice(5)}_${String(i + 1).padStart(2, "0")}`,
-      cardId: c.id, date: daysAgo(day, 9 + (i % 9), (i * 17) % 60), merchant, category, type,
-      amount: refunded ? -Math.round(base / 2) : base, currency: c.currency,
-      fee: type === "Capture" ? Math.round(base * 0.012 * 100) / 100 : 0,
-      status: declined ? "Declined" : refunded ? "Refunded" : type === "Authorization" ? "Approved" : "Settled",
-      ref: `TXN-CRD-${c.last4}${String(i + 1).padStart(2, "0")}`,
-      declineReason: declined ? (i % 2 ? "Insufficient card balance" : "Merchant category not allowed") : undefined,
-    });
-  }
-  return out.sort((a, b) => b.date.localeCompare(a.date));
-}
-
-function fundingFor(c: DemoCardFull): FundingRecord[] {
-  if (c.status === "Pending" || c.totalFunded === 0) return [];
-  const parts = c.totalFunded >= 1000000 ? 4 : c.totalFunded >= 100000 ? 3 : 2;
-  const out: FundingRecord[] = [];
-  let remaining = c.totalFunded;
-  for (let i = 0; i < parts; i++) {
-    const amount = i === parts - 1 ? remaining : Math.round(c.totalFunded / parts);
-    remaining -= amount;
-    const automatic = c.autoFunding.enabled && i > 0;
-    out.push({
-      id: `fund_${c.id.slice(5)}_${i + 1}`, cardId: c.id, date: daysAgo(4 + i * 21, 8 + i, 15),
-      amount, currency: c.currency, source: c.fundingSource, method: "Balance transfer",
-      initiatedBy: automatic ? "Automatic rule" : c.source === "API" ? c.createdBy : "Ada Okafor",
-      channel: automatic ? "Automatic rule" : c.source, status: "Completed",
-      linkedTxn: `TXN-FND-${c.last4}${i + 1}`,
-    });
-  }
-  return out.sort((a, b) => b.date.localeCompare(a.date));
-}
-
-function activityFor(c: DemoCardFull, txns: CardTransaction[], funds: FundingRecord[]): CardActivity[] {
-  const events: CardActivity[] = [{
-    id: `act_${c.id}_issue`, cardId: c.id, time: c.createdAt, type: "Card issued", actor: c.createdBy, channel: c.source,
-    description: `${c.kind} ${c.network} card issued (${c.fundingModel.toLowerCase()} funding).`, ref: c.issueRef,
-    correlationId: `req_${c.id.slice(5)}_issue`, kind: "operational",
-  }];
-  for (const f of funds) events.push({
-    id: `act_${f.id}`, cardId: c.id, time: f.date, type: f.channel === "Automatic rule" ? "Automatic funding rule triggered" : "Card funded",
-    actor: f.initiatedBy, channel: f.channel, description: `${f.status === "Completed" ? "Funded" : "Funding"} from ${f.source}.`,
-    ref: f.linkedTxn, correlationId: `req_${f.id}`, kind: "financial",
-  });
-  for (const t of txns.filter(t => t.type === "Decline").slice(0, 2)) events.push({
-    id: `act_${t.id}`, cardId: c.id, time: t.date, type: "Authorization declined", actor: "Card issuer", channel: "Issuer webhook",
-    description: `${t.merchant}: ${t.declineReason}.`, ref: t.ref, correlationId: `req_${t.id}`, kind: "financial",
-  });
-  if (c.status === "Paused") events.push({
-    id: `act_${c.id}_pause`, cardId: c.id, time: daysAgo(6, 16), type: "Card paused", actor: "Ada Okafor", channel: "Dashboard",
-    description: "Card paused from the dashboard.", correlationId: `req_${c.id.slice(5)}_pause`, kind: "operational",
-  });
-  if (c.status === "Terminated" && c.terminatedAt) events.push({
-    id: `act_${c.id}_term`, cardId: c.id, time: c.terminatedAt, type: "Card terminated", actor: c.terminatedBy ?? "Ada Okafor", channel: c.source,
-    description: `Terminated: ${c.terminateReason ?? "No reason recorded"}.`, correlationId: `req_${c.id.slice(5)}_term`, kind: "operational",
-  });
-  return events.sort((a, b) => b.time.localeCompare(a.time));
-}
-
-const INITIAL_TXNS = INITIAL_CARDS.flatMap(c => txnsFor(c, 8));
-const INITIAL_FUNDING = INITIAL_CARDS.flatMap(fundingFor);
-const INITIAL_ACTIVITY = INITIAL_CARDS.flatMap(c => activityFor(c, INITIAL_TXNS.filter(t => t.cardId === c.id), INITIAL_FUNDING.filter(f => f.cardId === c.id)));
-
-export const cardsStore = createDemoStore<DemoCardFull[]>(INITIAL_CARDS);
-export const cardTxnsStore = createDemoStore<CardTransaction[]>(INITIAL_TXNS);
-export const cardFundingStore = createDemoStore<FundingRecord[]>(INITIAL_FUNDING);
-export const cardActivityStore = createDemoStore<CardActivity[]>(INITIAL_ACTIVITY);
+export const cardsStore = createSimStore<DemoCardFull[]>("cards", (env) => getDataset(env).cards, { overlay: true });
+export const cardTxnsStore = createSimStore<CardTransaction[]>("card-txns", (env) => getDataset(env).cardTransactions, { overlay: true });
+export const cardFundingStore = createSimStore<FundingRecord[]>("card-funding", (env) => getDataset(env).cardFunding, { overlay: true });
+export const cardActivityStore = createSimStore<CardActivity[]>("card-activity", (env) => getDataset(env).cardActivity, { overlay: true });
 
 export const getCard = (id: string) => cardsStore.get().find(c => c.id === id);
 export const cardTxns = (id: string) => cardTxnsStore.get().filter(t => t.cardId === id);

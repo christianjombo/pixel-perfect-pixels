@@ -13,7 +13,7 @@ import {
 } from './local-store';
 
 export const getAIWorkspace = async () => ({
-  workspace: { id: 'demo-workspace', name: 'Adaeze Foods Ltd', timezone: 'Africa/Lagos' },
+  workspace: { id: 'demo-workspace', name: 'Nova Retail Ltd', timezone: 'Africa/Lagos' },
   profile: { display_name: 'Ada' },
 });
 

@@ -6,6 +6,7 @@ import {
   PanelLeftClose, PanelLeftOpen, LayoutTemplate, Menu, X, Banknote, ShoppingCart, BarChart3, Trash2,
 } from "lucide-react";
 import { Logo, LogoMark } from "./Logo";
+import { hydrateSimStores } from "@/lib/sim/store";
 
 type NavTo =
   | "/dashboard" | "/balances" | "/balances-old" | "/transactions" | "/transfers" | "/payouts"
@@ -130,6 +131,8 @@ export function AppShell({ business, initials, live, onLiveChange, children }: {
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [drawer, setDrawer] = useState(false);
+  // Apply persisted demo-data mutations after hydration (SSR renders the base dataset).
+  useEffect(() => hydrateSimStores(), []);
   const switcher = (
     <button className="flex min-w-0 max-w-[16rem] items-center gap-2.5 rounded-lg border px-2.5 py-1.5 text-left hover:bg-muted" aria-label="Switch business">
       <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-primary text-xs font-bold text-primary-foreground">{business.slice(0, 1)}</span>

@@ -1,10 +1,10 @@
-// SAMPLE DATA — balance movements derived from the sample ledger and payouts, with running
-// balances that close on the current available total. Internal transfers between Nova Retail's
-// own accounts move money between wallets without changing the currency-level balance, so they
-// are excluded here. Pending items are excluded too: a movement only posts once it settles.
+// SAMPLE DATA — balance movements derived from the shared simulation ledger and payouts, with
+// running balances that close on the current available total. Internal transfers between Nova
+// Retail's own accounts move money between wallets without changing the currency-level balance,
+// so they are excluded here. Pending items are excluded too: a movement only posts once it settles.
 import { daysAgo } from "@/lib/dates";
-import { INITIAL_LEDGER } from "./ledger";
-import { INITIAL_ACCOUNTS } from "./accounts";
+import { ledgerStore } from "./ledger";
+import { accountsStore } from "./accounts";
 import { payoutsStore } from "./payouts";
 import type { Currency } from "@/lib/money";
 
@@ -23,7 +23,7 @@ type Movement = { date: string; details: string; reference: string; amount: numb
 
 function movementsFor(currency: Currency): Movement[] {
   const out: Movement[] = [];
-  for (const r of INITIAL_LEDGER) {
+  for (const r of ledgerStore.get()) {
     if (r.currency !== currency) continue;
     if (r.type === "Payment" && r.status === "Successful")
       out.push({ date: r.date, details: "Customer payment", reference: r.id, amount: r.amount });
@@ -54,15 +54,17 @@ function movementsFor(currency: Currency): Movement[] {
 }
 
 const cache = new Map<Currency, BalanceMove[]>();
+// Any change to the underlying stores (including a Test/Live switch) invalidates the cache.
+for (const s of [ledgerStore, accountsStore, payoutsStore]) s.subscribe(() => cache.clear());
 
 /** Newest first. Running balances are mathematically consistent and close on today's available total. */
 export function balanceHistory(currency: Currency): BalanceMove[] {
   const cached = cache.get(currency);
   if (cached) return cached;
-  const closing = INITIAL_ACCOUNTS.filter((a) => a.currency === currency).reduce(
-    (s, a) => s + a.available,
-    0,
-  );
+  const closing = accountsStore
+    .get()
+    .filter((a) => a.currency === currency)
+    .reduce((s, a) => s + a.available, 0);
   const moves = movementsFor(currency);
   const net = moves.reduce((s, m) => s + m.amount, 0);
   let running = closing - net;

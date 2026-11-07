@@ -1,6 +1,6 @@
 import { createDemoStore } from "./demo-store";
 
 /** Test/Live switch shared by every dashboard page so it doesn't reset when you change page. */
-const store = createDemoStore(true);
-export const useLiveMode = () => store.use();
-export const setLiveMode = (v: boolean) => store.set(v);
+export const liveModeStore = createDemoStore(true);
+export const useLiveMode = () => liveModeStore.use();
+export const setLiveMode = (v: boolean) => liveModeStore.set(v);
