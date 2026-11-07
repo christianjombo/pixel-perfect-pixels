@@ -11,6 +11,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Get everything you need to run your business from one place: payments, payouts, invoices, inventory and more." },
       { property: "og:title", content: "Create your Griv account — Griv Finance" },
       { property: "og:description", content: "Everything you need to run your business, from one platform built for African businesses." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: SignUp,
