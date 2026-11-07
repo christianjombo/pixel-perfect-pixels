@@ -9,7 +9,7 @@ async function run(environment:string,q=query){
  return await execute(q,{toolCallId:'test',messages:[],context:{},abortSignal:new AbortController().signal}) as ToolResult;
 }
 describe('Griv AI data boundaries',()=>{
- it('never returns sample financial records in Live',async()=>{const result=await run('live');expect(result.kind).toBe('unavailable');expect(result.sample).toBe(false);expect(result.rows).toEqual([]);expect(result.metrics).toEqual([]);});
+ it('labels Live analysis as simulated demo data',async()=>{const result=await run('live');expect(result.kind).toBe('report');expect(result.sample).toBe(true);expect(result.limitations.join(' ')).toMatch(/[Ss]imulated/);expect(result.rows.length).toBeGreaterThan(0);});
  it('labels Test analysis as sample data',async()=>{const result=await run('test');expect(result.sample).toBe(true);expect(result.rows.length).toBeGreaterThan(0);});
  it('USD commerce cannot return NGN orders',async()=>{const result=await run('test',{...query,module:'commerce',currency:'USD'});expect(result.rows).toEqual([]);expect(result.metrics[0]?.value).toBe(0);});
  it('requires a valid Test or Live conversation environment',()=>{expect(threadSchema.safeParse({title:'Report',environment:'admin',currency:'NGN',period:'Last 30 days'}).success).toBe(false);});
