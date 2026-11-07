@@ -1,12 +1,10 @@
 # Roadmap
 
 ## Griv AI complete product redesign
-- [x] Phase 1 implementation: secure sign-in, server-validated business scope, saved threaded conversations and real streaming AI
-- [x] Phase 1 workspace: history, composer, context, grounded read-only sample tools, charts/tables, reports and record links
-- [x] Non-executing operational previews; financial execution, automation and file services explicitly unavailable
-- [x] Verify read-only currency/environment rules, public desktop/mobile sign-in, unauthorized rejection and real gateway streaming
-- [ ] Authenticated verification: multi-thread reload, multi-turn tool calls, cancellation and exports — blocked by absence of a confirmed AI account
-- [ ] Later phase: contextual shared-conversation drawer and connected operational data/actions — requires expansion beyond the initial phase and real providers
+- [x] Prototype pivot (user decision): no login — Griv AI will run on Griv's own backend, so the app prototypes every interaction locally for the backend team to implement
+- [x] Browser-local saved conversations (history, search, pin, rename, delete, environment scopes) mirroring the future backend API shape
+- [x] Real streaming AI with grounded read-only sample tools, charts/tables, reports, record links and non-executing action previews
+- [ ] Later phase: wire conversations.functions.ts and /api/ai-chat to the real Griv backend with server-side identity, scoped threads and connected operational data/actions
 
 ## Insights complete redesign
 - [x] Canonical analytics model: reporting dates, currency-safe metrics, comparisons and shared operational data
