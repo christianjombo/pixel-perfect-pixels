@@ -1,6 +1,7 @@
 // SAMPLE DATA — external payouts and fictional recipients for Nova Retail Ltd., Lagos.
-import { createDemoStore } from "@/lib/demo-store";
-import { daysAgo } from "@/lib/dates";
+// Records come from the shared simulation layer and reference real balance accounts.
+import { createSimStore } from "@/lib/sim/store";
+import { getDataset, payoutFee } from "@/lib/sim/dataset";
 import type { Currency } from "@/lib/money";
 export type Recipient = {
   id: string;
@@ -11,58 +12,7 @@ export type Recipient = {
   channel: "Bank transfer" | "Mobile money";
 };
 export const BANKS = ["Access Bank", "GTBank", "Zenith Bank", "First Bank", "UBA", "Moniepoint"];
-export const recipientStore = createDemoStore<Recipient[]>([
-  {
-    id: "rec_1",
-    name: "ADEBAYO LOGISTICS LTD",
-    bank: "GTBank",
-    account: "0123456789",
-    currency: "NGN",
-    channel: "Bank transfer",
-  },
-  {
-    id: "rec_2",
-    name: "CHIAMAKA OKAFOR",
-    bank: "Access Bank",
-    account: "0234567890",
-    currency: "NGN",
-    channel: "Bank transfer",
-  },
-  {
-    id: "rec_3",
-    name: "EKO PACKAGING LTD",
-    bank: "Zenith Bank",
-    account: "0345678901",
-    currency: "NGN",
-    channel: "Bank transfer",
-  },
-  {
-    id: "rec_4",
-    name: "AMA MENSAH",
-    bank: "MTN MoMo",
-    account: "0244567890",
-    currency: "GHS",
-    channel: "Mobile money",
-  },
-  {
-    id: "rec_5",
-    name: "KIPTOO DELIVERY",
-    bank: "M-Pesa",
-    account: "0712345678",
-    currency: "KES",
-    channel: "Mobile money",
-  },
-]);
-export const payoutFee = (amount: number, currency: Currency = "NGN") =>
-  currency === "NGN"
-    ? amount <= 5000
-      ? 10.75
-      : amount <= 50000
-        ? 26.88
-        : 53.75
-    : currency === "GHS"
-      ? 2
-      : 30;
+export { payoutFee };
 export type Payout = {
   id: string;
   recipient: Recipient;
@@ -77,52 +27,15 @@ export type Payout = {
   reason?: string;
   retryOf?: string;
 };
-const recipients = recipientStore.get();
-export const payoutsStore = createDemoStore<Payout[]>(
-  Array.from({ length: 22 }, (_, i) => {
-    const recipient = recipients[i % recipients.length]!;
-    const amount =
-      recipient.currency === "NGN"
-        ? [245000, 4500, 32500, 780000][i % 4]!
-        : recipient.currency === "GHS"
-          ? 1250
-          : 18500;
-    return {
-      id: `PAY-NR-${3068 - i}`,
-      recipient,
-      source:
-        recipient.currency === "NGN"
-          ? "acc_ngn_main"
-          : recipient.currency === "GHS"
-            ? "acc_ghs"
-            : "acc_kes",
-      amount,
-      fee: payoutFee(amount, recipient.currency),
-      currency: recipient.currency,
-      status:
-        i === 2 || i === 7
-          ? "Failed"
-          : i === 0 || i === 4
-            ? "Pending"
-            : i === 5
-              ? "Scheduled"
-              : "Successful",
-      date: daysAgo(i, 11, 24),
-      narration: [
-        "Delivery partner settlement",
-        "Store team reimbursement",
-        "Packaging supplies",
-        "Branch delivery services",
-      ][i % 4]!,
-      ...(i === 2 || i === 7
-        ? {
-            reason:
-              "The destination bank could not accept this payout. The original attempt was not debited. Verify the recipient details before retrying.",
-          }
-        : {}),
-      ...(i === 5 ? { schedule: "2026-10-25" } : {}),
-    };
-  }),
+export const recipientStore = createSimStore<Recipient[]>(
+  "recipients",
+  (env) => getDataset(env).recipients,
+  { overlay: true },
+);
+export const payoutsStore = createSimStore<Payout[]>(
+  "payouts",
+  (env) => getDataset(env).payouts,
+  { overlay: true },
 );
 export type BulkRow = {
   line: number;
@@ -139,7 +52,7 @@ export function parsePayoutCsv(text: string): BulkRow[] {
   let row: string[] = [];
   let cell = "";
   let quoted = false;
-  const input = text.replace(/^\uFEFF/, "");
+  const input = text.replace(/^﻿/, "");
   for (let i = 0; i < input.length; i++) {
     const c = input[i]!;
     if (c === '"') {
