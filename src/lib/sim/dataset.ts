@@ -422,7 +422,8 @@ export function generateDataset(env: SimEnv): SimDataset {
   for (let i = 0; i < scale.cards; i++) {
     const currency = weighted(rng, [["NGN", 82], ["USD", 9], ["GHS", 3], ["KES", 3], ["ZAR", 3]] as const);
     const holder = pick(rng, TEAM);
-    const createdDay = int(rng, 60, 400);
+    // Include recently issued cards so the Cards page's default "Last 30 days" view isn't empty.
+    const createdDay = int(rng, 0, 400);
     const status: DemoCardFull["status"] = chance(rng, 0.08)
       ? "Paused"
       : chance(rng, 0.05)
