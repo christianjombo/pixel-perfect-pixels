@@ -38,6 +38,8 @@ import { Route as TransfersRouteImport } from './routes/transfers'
 import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as VirtualAccountsRouteImport } from './routes/virtual-accounts'
 import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as CardsIndexRouteImport } from './routes/cards.index'
+import { Route as CardsCardIdRouteImport } from './routes/cards.$cardId'
 import { Route as InvoicesIndexRouteImport } from './routes/invoices.index'
 import { Route as InvoicesInvoiceIdRouteImport } from './routes/invoices.$invoiceId'
 import { Route as InvoicesNewRouteImport } from './routes/invoices.new'
@@ -197,6 +199,16 @@ const WelcomeRoute = WelcomeRouteImport.update({
   path: '/welcome',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CardsIndexRoute = CardsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CardsRoute,
+} as any)
+const CardsCardIdRoute = CardsCardIdRouteImport.update({
+  id: '/$cardId',
+  path: '/$cardId',
+  getParentRoute: () => CardsRoute,
+} as any)
 const InvoicesIndexRoute = InvoicesIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -268,7 +280,7 @@ export interface FileRoutesByFullPath {
   '/ai': typeof AiRoute
   '/balances': typeof BalancesRoute
   '/balances-old': typeof BalancesOldRoute
-  '/cards': typeof CardsRoute
+  '/cards': typeof CardsRouteWithChildren
   '/checkout-demo': typeof CheckoutDemoRoute
   '/credit': typeof CreditRoute
   '/customers': typeof CustomersRoute
@@ -293,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/verify': typeof VerifyRoute
   '/virtual-accounts': typeof VirtualAccountsRoute
   '/welcome': typeof WelcomeRoute
+  '/cards/$cardId': typeof CardsCardIdRoute
   '/invoices/$invoiceId': typeof InvoicesInvoiceIdRoute
   '/invoices/new': typeof InvoicesNewRoute
   '/merchant-groups/$group': typeof MerchantGroupsGroupRoute
@@ -300,6 +313,7 @@ export interface FileRoutesByFullPath {
   '/payment-links/$linkId': typeof PaymentLinksLinkIdRoute
   '/payment-links/new': typeof PaymentLinksNewRoute
   '/settings/$slug': typeof SettingsSlugRoute
+  '/cards/': typeof CardsIndexRoute
   '/invoices/': typeof InvoicesIndexRoute
   '/merchant-groups/': typeof MerchantGroupsIndexRoute
   '/payment-links/': typeof PaymentLinksIndexRoute
@@ -312,7 +326,6 @@ export interface FileRoutesByTo {
   '/ai': typeof AiRoute
   '/balances': typeof BalancesRoute
   '/balances-old': typeof BalancesOldRoute
-  '/cards': typeof CardsRoute
   '/checkout-demo': typeof CheckoutDemoRoute
   '/credit': typeof CreditRoute
   '/customers': typeof CustomersRoute
@@ -334,6 +347,7 @@ export interface FileRoutesByTo {
   '/verify': typeof VerifyRoute
   '/virtual-accounts': typeof VirtualAccountsRoute
   '/welcome': typeof WelcomeRoute
+  '/cards/$cardId': typeof CardsCardIdRoute
   '/invoices/$invoiceId': typeof InvoicesInvoiceIdRoute
   '/invoices/new': typeof InvoicesNewRoute
   '/merchant-groups/$group': typeof MerchantGroupsGroupRoute
@@ -341,6 +355,7 @@ export interface FileRoutesByTo {
   '/payment-links/$linkId': typeof PaymentLinksLinkIdRoute
   '/payment-links/new': typeof PaymentLinksNewRoute
   '/settings/$slug': typeof SettingsSlugRoute
+  '/cards': typeof CardsIndexRoute
   '/invoices': typeof InvoicesIndexRoute
   '/merchant-groups': typeof MerchantGroupsIndexRoute
   '/payment-links': typeof PaymentLinksIndexRoute
@@ -354,7 +369,7 @@ export interface FileRoutesById {
   '/ai': typeof AiRoute
   '/balances': typeof BalancesRoute
   '/balances-old': typeof BalancesOldRoute
-  '/cards': typeof CardsRoute
+  '/cards': typeof CardsRouteWithChildren
   '/checkout-demo': typeof CheckoutDemoRoute
   '/credit': typeof CreditRoute
   '/customers': typeof CustomersRoute
@@ -379,6 +394,7 @@ export interface FileRoutesById {
   '/verify': typeof VerifyRoute
   '/virtual-accounts': typeof VirtualAccountsRoute
   '/welcome': typeof WelcomeRoute
+  '/cards/$cardId': typeof CardsCardIdRoute
   '/invoices/$invoiceId': typeof InvoicesInvoiceIdRoute
   '/invoices/new': typeof InvoicesNewRoute
   '/merchant-groups/$group': typeof MerchantGroupsGroupRoute
@@ -386,6 +402,7 @@ export interface FileRoutesById {
   '/payment-links/$linkId': typeof PaymentLinksLinkIdRoute
   '/payment-links/new': typeof PaymentLinksNewRoute
   '/settings/$slug': typeof SettingsSlugRoute
+  '/cards/': typeof CardsIndexRoute
   '/invoices/': typeof InvoicesIndexRoute
   '/merchant-groups/': typeof MerchantGroupsIndexRoute
   '/payment-links/': typeof PaymentLinksIndexRoute
@@ -425,6 +442,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/virtual-accounts'
     | '/welcome'
+    | '/cards/$cardId'
     | '/invoices/$invoiceId'
     | '/invoices/new'
     | '/merchant-groups/$group'
@@ -432,6 +450,7 @@ export interface FileRouteTypes {
     | '/payment-links/$linkId'
     | '/payment-links/new'
     | '/settings/$slug'
+    | '/cards/'
     | '/invoices/'
     | '/merchant-groups/'
     | '/payment-links/'
@@ -444,7 +463,6 @@ export interface FileRouteTypes {
     | '/ai'
     | '/balances'
     | '/balances-old'
-    | '/cards'
     | '/checkout-demo'
     | '/credit'
     | '/customers'
@@ -466,6 +484,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/virtual-accounts'
     | '/welcome'
+    | '/cards/$cardId'
     | '/invoices/$invoiceId'
     | '/invoices/new'
     | '/merchant-groups/$group'
@@ -473,6 +492,7 @@ export interface FileRouteTypes {
     | '/payment-links/$linkId'
     | '/payment-links/new'
     | '/settings/$slug'
+    | '/cards'
     | '/invoices'
     | '/merchant-groups'
     | '/payment-links'
@@ -510,6 +530,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/virtual-accounts'
     | '/welcome'
+    | '/cards/$cardId'
     | '/invoices/$invoiceId'
     | '/invoices/new'
     | '/merchant-groups/$group'
@@ -517,6 +538,7 @@ export interface FileRouteTypes {
     | '/payment-links/$linkId'
     | '/payment-links/new'
     | '/settings/$slug'
+    | '/cards/'
     | '/invoices/'
     | '/merchant-groups/'
     | '/payment-links/'
@@ -530,7 +552,7 @@ export interface RootRouteChildren {
   AiRoute: typeof AiRoute
   BalancesRoute: typeof BalancesRoute
   BalancesOldRoute: typeof BalancesOldRoute
-  CardsRoute: typeof CardsRoute
+  CardsRoute: typeof CardsRouteWithChildren
   CheckoutDemoRoute: typeof CheckoutDemoRoute
   CreditRoute: typeof CreditRoute
   CustomersRoute: typeof CustomersRoute
@@ -765,6 +787,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WelcomeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cards/': {
+      id: '/cards/'
+      path: '/'
+      fullPath: '/cards/'
+      preLoaderRoute: typeof CardsIndexRouteImport
+      parentRoute: typeof CardsRoute
+    }
+    '/cards/$cardId': {
+      id: '/cards/$cardId'
+      path: '/$cardId'
+      fullPath: '/cards/$cardId'
+      preLoaderRoute: typeof CardsCardIdRouteImport
+      parentRoute: typeof CardsRoute
+    }
     '/invoices/': {
       id: '/invoices/'
       path: '/'
@@ -859,6 +895,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface CardsRouteChildren {
+  CardsCardIdRoute: typeof CardsCardIdRoute
+  CardsIndexRoute: typeof CardsIndexRoute
+}
+
+const CardsRouteChildren: CardsRouteChildren = {
+  CardsCardIdRoute: CardsCardIdRoute,
+  CardsIndexRoute: CardsIndexRoute,
+}
+
+const CardsRouteWithChildren = CardsRoute._addFileChildren(CardsRouteChildren)
+
 interface InvoicesRouteChildren {
   InvoicesInvoiceIdRoute: typeof InvoicesInvoiceIdRoute
   InvoicesNewRoute: typeof InvoicesNewRoute
@@ -914,7 +962,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiRoute: AiRoute,
   BalancesRoute: BalancesRoute,
   BalancesOldRoute: BalancesOldRoute,
-  CardsRoute: CardsRoute,
+  CardsRoute: CardsRouteWithChildren,
   CheckoutDemoRoute: CheckoutDemoRoute,
   CreditRoute: CreditRoute,
   CustomersRoute: CustomersRoute,

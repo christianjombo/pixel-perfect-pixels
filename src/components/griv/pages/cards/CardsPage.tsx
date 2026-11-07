@@ -1,30 +1,219 @@
-import { useState } from "react";
-import { CreditCard, Plus, Pause, Play, LockKeyhole, CircleX } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { CreditCard, MoreHorizontal, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { DashboardPage } from "@/components/griv/DashboardPage";
-import { StatusBadge, DetailDrawer, DetailList, FormDialog, Field, ConfirmDialog } from "@/components/griv/kit";
-import { Logo } from "@/components/griv/Logo";
-import { cardsStore, cardRequestsStore, requestCard, toggleDemoCard, closeDemoCard } from "@/lib/demo/business-pages";
-import { formatMoney, type Currency } from "@/lib/money";
+import {
+  DataTable, DateRangeSelect, ExportButton, Field, FilterSelect, FormDialog, MetricCard, MetricGrid,
+  SearchInput, StatusBadge, StatusTabs, Toolbar, useDemoLoading, type Column,
+} from "@/components/griv/kit";
+import {
+  cardExportRows, cardsStore, cardTxnsStore, issueCard, type CardKind, type CardNetwork, type DemoCardFull,
+} from "@/lib/demo/cards";
+import { exportCsv } from "@/lib/csv";
+import { inRange, type DateRange } from "@/lib/dates";
+import { formatMoney, formatMoneyCompact, totalsByCurrency, CURRENCIES, type Currency } from "@/lib/money";
 import { useGriv } from "@/lib/griv-store";
 import { toast } from "sonner";
 
+type Tab = "All cards" | "Active" | "Paused" | "Pending" | "Terminated";
+
+const NETWORKS: CardNetwork[] = ["Visa", "Mastercard", "Verve"];
+
 export function CardsPage() {
-  const cards = cardsStore.use(); const requests = cardRequestsStore.use(); const g = useGriv();
-  const [selectedId, setSelectedId] = useState<string | null>(null); const [create, setCreate] = useState(false); const [close, setClose] = useState(false);
-  const [filter, setFilter] = useState("All cards"); const [name, setName] = useState(""); const [currency, setCurrency] = useState<Currency>("NGN"); const [error, setError] = useState("");
-  const selected = cards.find(c => c.id === selectedId); const shown = cards.filter(c => filter === "All cards" || c.status === filter);
-  return <DashboardPage title="Cards" description="Keep business spending separate and stay in control." actions={<Button onClick={() => { setName(""); setError(""); setCreate(true); }}><Plus />Request card</Button>}>
-    <div className="mb-6 flex items-center gap-3 text-sm"><span className="text-muted-foreground">Show for:</span><select className="field w-auto" aria-label="Card status" value={filter} onChange={e => setFilter(e.target.value)}>{["All cards", "Active", "Paused", "Closed"].map(v => <option key={v}>{v}</option>)}</select><span className="ml-auto text-xs text-muted-foreground">Demo cards</span></div>
-    <div className="mb-8 grid gap-6 lg:grid-cols-2">{shown.map(c => <article key={c.id} className="overflow-hidden rounded-lg border bg-card"><div className="p-5"><div className="flex items-center justify-between"><h2 className="font-semibold">{c.name}</h2><StatusBadge status={c.status} /></div>
-      <div className="my-5 aspect-[1.586] max-w-sm rounded-lg bg-sidebar p-6 text-sidebar-foreground"><div className="flex justify-between"><Logo variant="light" className="h-6" /><span className="text-xs text-sidebar-foreground/65">DEMO · {c.currency}</span></div><CreditCard className="mt-6 h-8 w-8 text-sidebar-primary" /><p className="mt-4 text-xl tabular-nums">•••• &nbsp; •••• &nbsp; •••• &nbsp; {c.last4}</p><p className="mt-5 text-sm">{c.holder}</p></div>
-      <div className="grid grid-cols-2 gap-4 border-t pt-4"><div><p className="text-xs text-muted-foreground">Sample spend</p><p className="mt-1 text-lg font-semibold">{formatMoney(c.spent, c.currency)}</p></div><div><p className="text-xs text-muted-foreground">Sample monthly limit</p><p className="mt-1 text-lg font-semibold">{formatMoney(c.limit, c.currency)}</p></div></div></div>
-      <div className="flex flex-wrap justify-between gap-2 border-t bg-muted/30 px-5 py-3"><Button variant="outline" onClick={() => setSelectedId(c.id)}><CreditCard />View card</Button><Button variant="ghost" disabled={c.status === "Closed"} onClick={() => toggleDemoCard(c.id)}>{c.status === "Paused" ? <Play /> : <Pause />}{c.status === "Paused" ? "Resume demo card" : "Pause demo card"}</Button></div></article>)}{!shown.length && <p className="py-12 text-muted-foreground">No cards with this status.</p>}</div>
-    <section className="rounded-lg border bg-card"><h2 className="border-b bg-muted/50 px-5 py-3 font-semibold">Card requests</h2>{requests.length ? requests.map(r => <div key={r.id} className="flex flex-wrap items-center justify-between gap-3 border-b p-5 last:border-b-0"><div><p className="font-medium">{r.name}</p><p className="text-xs text-muted-foreground">{r.id} · {r.currency} · {r.holder}</p></div><StatusBadge status={r.status} /></div>) : <div className="flex items-center gap-3 p-6 text-sm text-muted-foreground"><LockKeyhole className="h-5 w-5" />No card requests.</div>}</section>
-    <DetailDrawer open={!!selected} onOpenChange={o => { if (!o) setSelectedId(null); }} title={selected?.name ?? "Card"} subtitle="Demo card" badge={selected && <StatusBadge status={selected.status} />} footer={<Button variant="destructive" disabled={selected?.status === "Closed"} onClick={() => setClose(true)}><CircleX />Close demo card</Button>}>
-      {selected && <><DetailList items={[["Cardholder", selected.holder], ["Card number", `•••• ${selected.last4}`], ["Currency", selected.currency], ["Monthly limit", formatMoney(selected.limit, selected.currency)], ["Sample spend", formatMoney(selected.spent, selected.currency)]]} /><p className="text-sm text-muted-foreground">These are sample cards. Card details, funding and real spending require an issuing provider.</p></>}
-    </DetailDrawer>
-    <ConfirmDialog open={close} onOpenChange={setClose} title="Close this demo card?" description="This only changes the sample card. A closed demo card cannot be resumed." danger confirmLabel="Close demo card" onConfirm={() => { if (selected) closeDemoCard(selected.id); setClose(false); }} />
-    <FormDialog open={create} onOpenChange={setCreate} title="Request a card" description="Demo request only. No card will be issued and no funds will be deducted."><form className="space-y-4" onSubmit={e => { e.preventDefault(); try { requestCard(name, `${g.firstName || "Ada"} ${g.lastName || "Okafor"}`, currency); setCreate(false); toast.info("Demo card request recorded as pending"); } catch (err) { setError(err instanceof Error ? err.message : "Unable to request card."); } }}><Field label="Card name" htmlFor="card-name"><input id="card-name" className="field" value={name} required onChange={e => setName(e.target.value)} /></Field><Field label="Currency"><select aria-label="Currency" className="field" value={currency} onChange={e => setCurrency(e.target.value as Currency)}><option>NGN</option><option>USD</option></select></Field>{error && <p role="alert" className="text-sm text-destructive">{error}</p>}<div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => setCreate(false)}>Cancel</Button><Button type="submit">Record demo request</Button></div></form></FormDialog>
-  </DashboardPage>;
+  const cards = cardsStore.use();
+  const txns = cardTxnsStore.use();
+  const g = useGriv();
+  const navigate = useNavigate();
+  const loading = useDemoLoading();
+  const actor = `${g.firstName || "Ada"} ${g.lastName || "Okafor"}`;
+
+  const [tab, setTab] = useState<Tab>("All cards");
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("All");
+  const [currency, setCurrency] = useState("All");
+  const [kind, setKind] = useState("All");
+  const [network, setNetwork] = useState("All");
+  const [source, setSource] = useState("All");
+  const [createdBy, setCreatedBy] = useState("All");
+  const [range, setRange] = useState<DateRange>("Last 30 days");
+  const [issueOpen, setIssueOpen] = useState(false);
+
+  const creators = useMemo(() => [...new Set(cards.map(c => c.createdBy))], [cards]);
+
+  const filtered = useMemo(() => cards.filter(c => {
+    if (tab !== "All cards" && c.status !== tab) return false;
+    if (status !== "All" && c.status !== status) return false;
+    if (currency !== "All" && c.currency !== currency) return false;
+    if (kind !== "All" && c.kind !== kind) return false;
+    if (network !== "All" && c.network !== network) return false;
+    if (source !== "All" && c.source !== source) return false;
+    if (createdBy !== "All" && c.createdBy !== createdBy) return false;
+    if (range !== "All time" && !inRange(c.createdAt, range)) return false;
+    const q = search.trim().toLowerCase();
+    if (q && ![c.nickname, c.holder, c.id, c.last4].some(v => v.toLowerCase().includes(q))) return false;
+    return true;
+  }), [cards, tab, status, currency, kind, network, source, createdBy, range, search]);
+
+  const periodTxns = useMemo(() => txns.filter(t => (t.type === "Capture" || t.type === "Fee") && inRange(t.date, range)), [txns, range]);
+  const balances = totalsByCurrency(cards.filter(c => c.status === "Active" || c.status === "Paused"), c => c.available, c => c.currency);
+  const spend = totalsByCurrency(periodTxns, t => t.amount + t.fee, t => t.currency);
+  const active = cards.filter(c => c.status === "Active").length;
+
+  const columns: Column<DemoCardFull>[] = [
+    { key: "card", header: "Card", sort: c => c.nickname, cell: c => (
+      <span className="flex items-center gap-2.5">
+        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-accent text-primary"><CreditCard className="h-4 w-4" /></span>
+        <span><span className="block font-medium">{c.nickname}</span>
+        <span className="block text-xs text-muted-foreground">{c.network} · {c.last4 ? `•••• ${c.last4}` : "not issued yet"}</span></span>
+      </span>
+    ) },
+    { key: "holder", header: "Cardholder", sort: c => c.holder, hideBelow: "md", cell: c => c.holder },
+    { key: "kind", header: "Type", hideBelow: "lg", cell: c => c.kind },
+    { key: "currency", header: "Currency", hideBelow: "lg", cell: c => c.currency },
+    { key: "status", header: "Status", sort: c => c.status, cell: c => <StatusBadge status={c.status} /> },
+    { key: "available", header: "Available", align: "right", sort: c => c.available, cell: c => formatMoney(c.available, c.currency) },
+    { key: "spent", header: "Total spend", align: "right", sort: c => c.totalSpent, hideBelow: "md", cell: c => formatMoney(c.totalSpent, c.currency) },
+    { key: "source", header: "Source", hideBelow: "lg", cell: c => c.source },
+    { key: "createdBy", header: "Created by", hideBelow: "lg", cell: c => <span className="text-muted-foreground">{c.createdBy}</span> },
+    { key: "created", header: "Created", sort: c => c.createdAt, hideBelow: "md", cell: c => <span className="text-muted-foreground">{new Date(c.createdAt).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}</span> },
+  ];
+
+  return (
+    <DashboardPage
+      crumbs={[{ label: "Cards" }]}
+      title="Cards"
+      description="Issue, manage and monitor all your cards."
+      notice="Sample card programme — cards, balances and activity are demo records from a mock issuer. Funding stays processing until a real issuer confirms; no real money moves."
+      actions={<>
+        <ExportButton label="Export" disabled={!filtered.length} onClick={() => { exportCsv("griv-cards", cardExportRows(filtered)); toast.success(`Exported ${filtered.length} cards (sensitive details excluded)`); }} />
+        <Button onClick={() => setIssueOpen(true)}><Plus />Issue card</Button>
+      </>}
+    >
+      <MetricGrid>
+        <MetricCard label="Total cards issued" value={cards.length} sub={`${cards.filter(c => c.source === "API").length} via API`} />
+        <MetricCard label="Active cards" value={active} sub={`${cards.filter(c => c.status === "Paused").length} paused · ${cards.filter(c => c.status === "Terminated").length} terminated`} />
+        <MetricCard label="Available card balance" value={Object.keys(balances).length ? Object.entries(balances).map(([cur, amt]) => formatMoneyCompact(amt, cur as Currency)).join(" · ") : "—"} sub="Per currency, never combined" />
+        <MetricCard label={`Card spend · ${range.toLowerCase()}`} value={Object.keys(spend).length ? Object.entries(spend).map(([cur, amt]) => formatMoneyCompact(amt, cur as Currency)).join(" · ") : "—"} sub={`${periodTxns.length} captures and fees`} />
+      </MetricGrid>
+
+      <section className="rounded-lg border bg-card">
+        <StatusTabs<Tab> value={tab} onChange={setTab} tabs={(["All cards", "Active", "Paused", "Pending", "Terminated"] as Tab[]).map(t => ({
+          value: t, label: t, count: t === "All cards" ? cards.length : cards.filter(c => c.status === t).length,
+        }))} />
+        <Toolbar right={<DateRangeSelect value={range} onChange={setRange} />}>
+          <SearchInput value={search} onChange={setSearch} placeholder="Search holder, nickname, ID or last 4" />
+          <FilterSelect label="Status" value={status} onChange={setStatus} options={["All", "Active", "Paused", "Pending", "Terminated", "Expired"]} />
+          <FilterSelect label="Currency" value={currency} onChange={setCurrency} options={["All", ...CURRENCIES]} />
+          <FilterSelect label="Type" value={kind} onChange={setKind} options={["All", "Virtual", "Physical"]} />
+          <FilterSelect label="Network" value={network} onChange={setNetwork} options={["All", ...NETWORKS]} />
+          <FilterSelect label="Source" value={source} onChange={setSource} options={["All", "Dashboard", "API"]} />
+          <FilterSelect label="Created by" value={createdBy} onChange={setCreatedBy} options={["All", ...creators]} />
+        </Toolbar>
+        <DataTable
+          columns={columns}
+          rows={filtered}
+          rowKey={c => c.id}
+          loading={loading}
+          pageSize={15}
+          initialSort={{ key: "created", dir: "desc" }}
+          onRowClick={c => navigate({ to: "/cards/$cardId", params: { cardId: c.id } })}
+          caption="All cards issued by this business"
+          rowActions={c => (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="grid h-8 w-8 place-items-center rounded-md hover:bg-muted" aria-label={`Actions for ${c.nickname}`}><MoreHorizontal className="h-4 w-4" /></button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem asChild><Link to="/cards/$cardId" params={{ cardId: c.id }}>View card</Link></DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => { navigator.clipboard.writeText(c.id); toast.success("Card ID copied"); }}>Copy card ID</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        />
+      </section>
+
+      <IssueCardDialog open={issueOpen} onOpenChange={setIssueOpen} actor={actor} />
+    </DashboardPage>
+  );
+}
+
+function IssueCardDialog({ open, onOpenChange, actor }: { open: boolean; onOpenChange: (o: boolean) => void; actor: string }) {
+  const [step, setStep] = useState<1 | 2>(1);
+  const [nickname, setNickname] = useState("");
+  const [holder, setHolder] = useState("");
+  const [kind, setKind] = useState<CardKind>("Virtual");
+  const [network, setNetwork] = useState<CardNetwork>("Visa");
+  const [currency, setCurrency] = useState<Currency>("NGN");
+  const [fundingModel, setFundingModel] = useState<"Prefunded" | "Linked balance">("Prefunded");
+  const [initialFunding, setInitialFunding] = useState("");
+  const [perTxn, setPerTxn] = useState("100000");
+  const [daily, setDaily] = useState("300000");
+  const [monthly, setMonthly] = useState("1000000");
+  const [error, setError] = useState("");
+
+  const reset = () => { setStep(1); setNickname(""); setHolder(""); setKind("Virtual"); setNetwork("Visa"); setCurrency("NGN"); setFundingModel("Prefunded"); setInitialFunding(""); setPerTxn("100000"); setDaily("300000"); setMonthly("1000000"); setError(""); };
+  const close = (o: boolean) => { onOpenChange(o); if (!o) reset(); };
+  const fundingSource = `${currency} business balance`;
+  const amount = Number(initialFunding) || 0;
+
+  const submit = () => {
+    try {
+      const c = issueCard({
+        nickname, holder, kind, network, currency, fundingModel, fundingSource, initialFunding: amount, createdBy: actor,
+        limits: { perTransaction: Number(perTxn) || 0, daily: Number(daily) || 0, monthly: Number(monthly) || 0 },
+      });
+      close(false);
+      toast.info(`Issuance requested for "${c.nickname}" — it activates when the demo issuer confirms`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't request this card.");
+      setStep(1);
+    }
+  };
+
+  return (
+    <FormDialog open={open} onOpenChange={close} title="Issue card" description={step === 1 ? "Demo issuance — the card stays pending until the issuer confirms. No funds move." : "Review before submitting to the demo issuer."}>
+      {step === 1 ? (
+        <form className="space-y-4" onSubmit={e => { e.preventDefault(); if (!nickname.trim() || !holder.trim()) { setError("Enter a card nickname and cardholder."); return; } setError(""); setStep(2); }}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Card nickname" htmlFor="issue-name"><input id="issue-name" className="field" value={nickname} onChange={e => setNickname(e.target.value)} placeholder="e.g. Marketing spend" /></Field>
+            <Field label="Cardholder" htmlFor="issue-holder"><input id="issue-holder" className="field" value={holder} onChange={e => setHolder(e.target.value)} placeholder="Person or team" /></Field>
+            <Field label="Card type"><select aria-label="Card type" className="field" value={kind} onChange={e => setKind(e.target.value as CardKind)}><option>Virtual</option><option>Physical</option></select></Field>
+            <Field label="Network"><select aria-label="Network" className="field" value={network} onChange={e => setNetwork(e.target.value as CardNetwork)}>{NETWORKS.map(n => <option key={n}>{n}</option>)}</select></Field>
+            <Field label="Currency"><select aria-label="Currency" className="field" value={currency} onChange={e => setCurrency(e.target.value as Currency)}>{CURRENCIES.map(c => <option key={c}>{c}</option>)}</select></Field>
+            <Field label="Funding model"><select aria-label="Funding model" className="field" value={fundingModel} onChange={e => setFundingModel(e.target.value as "Prefunded" | "Linked balance")}><option>Prefunded</option><option>Linked balance</option></select></Field>
+          </div>
+          {fundingModel === "Prefunded" && (
+            <Field label={`Initial funding (${currency})`} htmlFor="issue-funding" optional hint="Starts as a separate processing funding transaction — not part of issuance.">
+              <input id="issue-funding" className="field" inputMode="decimal" value={initialFunding} onChange={e => setInitialFunding(e.target.value)} placeholder="0" />
+            </Field>
+          )}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label="Per-transaction limit" htmlFor="issue-pt"><input id="issue-pt" className="field" inputMode="numeric" value={perTxn} onChange={e => setPerTxn(e.target.value)} /></Field>
+            <Field label="Daily limit" htmlFor="issue-dl"><input id="issue-dl" className="field" inputMode="numeric" value={daily} onChange={e => setDaily(e.target.value)} /></Field>
+            <Field label="Monthly limit" htmlFor="issue-ml"><input id="issue-ml" className="field" inputMode="numeric" value={monthly} onChange={e => setMonthly(e.target.value)} /></Field>
+          </div>
+          {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+          <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => close(false)}>Cancel</Button><Button type="submit">Review</Button></div>
+        </form>
+      ) : (
+        <div className="space-y-4">
+          <dl className="divide-y rounded-lg border text-sm">
+            {([
+              ["Nickname", nickname], ["Cardholder", holder], ["Type", `${kind} · ${network}`], ["Currency", currency],
+              ["Funding model", fundingModel], ["Funding source", fundingSource],
+              ["Initial funding", amount > 0 ? formatMoney(amount, currency) : "None"],
+              ["Limits", `${formatMoney(Number(perTxn) || 0, currency)} / txn · ${formatMoney(Number(daily) || 0, currency)} / day · ${formatMoney(Number(monthly) || 0, currency)} / month`],
+              ["Requested by", `${actor} · Dashboard`],
+            ] as [string, string][]).map(([k, v]) => (
+              <div key={k} className="flex items-start justify-between gap-4 px-4 py-2.5"><dt className="text-muted-foreground">{k}</dt><dd className="text-right font-medium">{v}</dd></div>
+            ))}
+          </dl>
+          {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
+          <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => setStep(1)}>Back</Button><Button onClick={submit}>Submit issuance request</Button></div>
+        </div>
+      )}
+    </FormDialog>
+  );
 }
