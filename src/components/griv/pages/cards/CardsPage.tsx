@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { CreditCard, MoreHorizontal, Plus } from "lucide-react";
+import { ChevronDown, CreditCard, Globe, MoreHorizontal, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { DashboardPage } from "@/components/griv/DashboardPage";
 import {
   DataTable, DateRangeSelect, ExportButton, Field, FilterSelect, FormDialog, MetricCard, MetricGrid,
@@ -93,13 +93,32 @@ export function CardsPage() {
         <MetricCard label={`Card spend · ${range.toLowerCase()}`} value={Object.keys(spend).length ? Object.entries(spend).map(([cur, amt]) => formatMoneyCompact(amt, cur as Currency)).join(" · ") : "—"} sub={`${periodTxns.length} captures and fees`} />
       </MetricGrid>
 
+      <div className="mb-6 flex items-center gap-1.5">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-auto gap-1.5 p-0 text-sm font-normal text-muted-foreground hover:bg-transparent hover:text-foreground" aria-label={`Show for: ${currency === "All" ? "All currencies" : currency}`}>
+              <Globe className="h-4 w-4" />
+              Show for:
+              <span className="font-medium text-foreground">{currency === "All" ? "All currencies" : currency}</span>
+              <ChevronDown className="h-3.5 w-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="min-w-32">
+            <DropdownMenuRadioGroup value={currency} onValueChange={setCurrency}>
+              {["All", ...CURRENCIES].map(c => (
+                <DropdownMenuRadioItem key={c} value={c}>{c === "All" ? "All currencies" : c}</DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+
       <section className="rounded-lg border bg-card">
         <StatusTabs<Tab> value={tab} onChange={setTab} tabs={(["All cards", "Active", "Paused", "Pending", "Terminated"] as Tab[]).map(t => ({
           value: t, label: t, count: t === "All cards" ? cards.length : cards.filter(c => c.status === t).length,
         }))} />
         <Toolbar right={<DateRangeSelect value={range} onChange={setRange} />}>
           <SearchInput value={search} onChange={setSearch} placeholder="Search holder, nickname, ID or last 4" />
-          <FilterSelect label="Currency" value={currency} onChange={setCurrency} options={["All", ...CURRENCIES]} />
           <FilterSelect label="Type" value={kind} onChange={setKind} options={["All", "Virtual", "Physical"]} />
           <FilterSelect label="Network" value={network} onChange={setNetwork} options={["All", ...NETWORKS]} />
           <FilterSelect label="Created by" value={createdBy} onChange={setCreatedBy} options={["All", ...creators]} />
