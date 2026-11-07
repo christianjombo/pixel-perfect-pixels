@@ -1,0 +1,3 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { AIPage } from '@/components/griv/pages/ai/AIPage';
+export const Route=createFileRoute('/ai/')({head:()=>({meta:[{title:'Griv AI — Your business copilot'},{name:'description',content:'Analyze business performance and start securely saved conversations with Griv AI.'},{property:'og:title',content:'Griv AI — Your business copilot'},{property:'og:description',content:'Business analysis, investigations and reports in one intelligent workspace.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),component:AIPage});

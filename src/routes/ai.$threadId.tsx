@@ -1,0 +1,3 @@
+import { createFileRoute } from '@tanstack/react-router';
+import { AIPage } from '@/components/griv/pages/ai/AIPage';
+export const Route=createFileRoute('/ai/$threadId')({head:()=>({meta:[{title:'Conversation — Griv AI'},{name:'description',content:'Continue your private Griv AI business conversation.'},{property:'og:title',content:'Conversation — Griv AI'},{property:'og:description',content:'Grounded business analysis in a securely saved Griv AI conversation.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),component:()=>{const {threadId}=Route.useParams();return <AIPage threadId={threadId}/>;}});

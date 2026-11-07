@@ -38,6 +38,7 @@ import { Route as TransfersRouteImport } from './routes/transfers'
 import { Route as VerifyRouteImport } from './routes/verify'
 import { Route as VirtualAccountsRouteImport } from './routes/virtual-accounts'
 import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as ApiAiChatRouteImport } from './routes/api/ai-chat'
 import { Route as CardsIndexRouteImport } from './routes/cards.index'
 import { Route as CardsCardIdRouteImport } from './routes/cards.$cardId'
 import { Route as InvoicesIndexRouteImport } from './routes/invoices.index'
@@ -199,6 +200,11 @@ const WelcomeRoute = WelcomeRouteImport.update({
   path: '/welcome',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAiChatRoute = ApiAiChatRouteImport.update({
+  id: '/api/ai-chat',
+  path: '/api/ai-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CardsIndexRoute = CardsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -305,6 +311,7 @@ export interface FileRoutesByFullPath {
   '/verify': typeof VerifyRoute
   '/virtual-accounts': typeof VirtualAccountsRoute
   '/welcome': typeof WelcomeRoute
+  '/api/ai-chat': typeof ApiAiChatRoute
   '/cards/$cardId': typeof CardsCardIdRoute
   '/invoices/$invoiceId': typeof InvoicesInvoiceIdRoute
   '/invoices/new': typeof InvoicesNewRoute
@@ -347,6 +354,7 @@ export interface FileRoutesByTo {
   '/verify': typeof VerifyRoute
   '/virtual-accounts': typeof VirtualAccountsRoute
   '/welcome': typeof WelcomeRoute
+  '/api/ai-chat': typeof ApiAiChatRoute
   '/cards/$cardId': typeof CardsCardIdRoute
   '/invoices/$invoiceId': typeof InvoicesInvoiceIdRoute
   '/invoices/new': typeof InvoicesNewRoute
@@ -394,6 +402,7 @@ export interface FileRoutesById {
   '/verify': typeof VerifyRoute
   '/virtual-accounts': typeof VirtualAccountsRoute
   '/welcome': typeof WelcomeRoute
+  '/api/ai-chat': typeof ApiAiChatRoute
   '/cards/$cardId': typeof CardsCardIdRoute
   '/invoices/$invoiceId': typeof InvoicesInvoiceIdRoute
   '/invoices/new': typeof InvoicesNewRoute
@@ -442,6 +451,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/virtual-accounts'
     | '/welcome'
+    | '/api/ai-chat'
     | '/cards/$cardId'
     | '/invoices/$invoiceId'
     | '/invoices/new'
@@ -484,6 +494,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/virtual-accounts'
     | '/welcome'
+    | '/api/ai-chat'
     | '/cards/$cardId'
     | '/invoices/$invoiceId'
     | '/invoices/new'
@@ -530,6 +541,7 @@ export interface FileRouteTypes {
     | '/verify'
     | '/virtual-accounts'
     | '/welcome'
+    | '/api/ai-chat'
     | '/cards/$cardId'
     | '/invoices/$invoiceId'
     | '/invoices/new'
@@ -577,6 +589,7 @@ export interface RootRouteChildren {
   VerifyRoute: typeof VerifyRoute
   VirtualAccountsRoute: typeof VirtualAccountsRoute
   WelcomeRoute: typeof WelcomeRoute
+  ApiAiChatRoute: typeof ApiAiChatRoute
   MerchantGroupsGroupRoute: typeof MerchantGroupsGroupRoute
   MerchantGroupsCompareRoute: typeof MerchantGroupsCompareRoute
   MerchantGroupsIndexRoute: typeof MerchantGroupsIndexRoute
@@ -787,6 +800,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WelcomeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/ai-chat': {
+      id: '/api/ai-chat'
+      path: '/api/ai-chat'
+      fullPath: '/api/ai-chat'
+      preLoaderRoute: typeof ApiAiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/cards/': {
       id: '/cards/'
       path: '/'
@@ -987,6 +1007,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerifyRoute: VerifyRoute,
   VirtualAccountsRoute: VirtualAccountsRoute,
   WelcomeRoute: WelcomeRoute,
+  ApiAiChatRoute: ApiAiChatRoute,
   MerchantGroupsGroupRoute: MerchantGroupsGroupRoute,
   MerchantGroupsCompareRoute: MerchantGroupsCompareRoute,
   MerchantGroupsIndexRoute: MerchantGroupsIndexRoute,
