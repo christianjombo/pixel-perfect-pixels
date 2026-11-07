@@ -20,6 +20,10 @@ export function createDemoStore<T>(initial: T) {
         () => initial,
       );
     },
+    subscribe(cb: () => void) {
+      listeners.add(cb);
+      return () => listeners.delete(cb);
+    },
   };
 }
 
