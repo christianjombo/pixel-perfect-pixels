@@ -30,7 +30,18 @@ import type {
   FundingRecord,
   CardActivity,
 } from "@/lib/demo/cards";
-import { payoutFee } from "@/lib/demo/payouts";
+
+/** Payout fee schedule — defined here so the generator and the payouts module share it. */
+export const payoutFee = (amount: number, currency: Currency = "NGN") =>
+  currency === "NGN"
+    ? amount <= 5000
+      ? 10.75
+      : amount <= 50000
+        ? 26.88
+        : 53.75
+    : currency === "GHS"
+      ? 2
+      : 30;
 
 export type SimEnv = "live" | "test";
 
