@@ -31,11 +31,9 @@ export function CardsPage() {
 
   const [tab, setTab] = useState<Tab>("All cards");
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("All");
   const [currency, setCurrency] = useState("All");
   const [kind, setKind] = useState("All");
   const [network, setNetwork] = useState("All");
-  const [source, setSource] = useState("All");
   const [createdBy, setCreatedBy] = useState("All");
   const [range, setRange] = useState<DateRange>("Last 30 days");
   const [issueOpen, setIssueOpen] = useState(false);
@@ -44,17 +42,15 @@ export function CardsPage() {
 
   const filtered = useMemo(() => cards.filter(c => {
     if (tab !== "All cards" && c.status !== tab) return false;
-    if (status !== "All" && c.status !== status) return false;
     if (currency !== "All" && c.currency !== currency) return false;
     if (kind !== "All" && c.kind !== kind) return false;
     if (network !== "All" && c.network !== network) return false;
-    if (source !== "All" && c.source !== source) return false;
     if (createdBy !== "All" && c.createdBy !== createdBy) return false;
     if (range !== "All time" && !inRange(c.createdAt, range)) return false;
     const q = search.trim().toLowerCase();
     if (q && ![c.nickname, c.holder, c.id, c.last4].some(v => v.toLowerCase().includes(q))) return false;
     return true;
-  }), [cards, tab, status, currency, kind, network, source, createdBy, range, search]);
+  }), [cards, tab, currency, kind, network, createdBy, range, search]);
 
   const periodTxns = useMemo(() => txns.filter(t => (t.type === "Capture" || t.type === "Fee") && inRange(t.date, range)), [txns, range]);
   const balances = totalsByCurrency(cards.filter(c => c.status === "Active" || c.status === "Paused"), c => c.available, c => c.currency);
@@ -62,22 +58,21 @@ export function CardsPage() {
   const active = cards.filter(c => c.status === "Active").length;
 
   const columns: Column<DemoCardFull>[] = [
-    { key: "card", header: "Card", sort: c => c.nickname, cell: c => (
+    { key: "card", header: "CARD", sort: c => c.nickname, cell: c => (
       <span className="flex items-center gap-2.5">
         <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-accent text-primary"><CreditCard className="h-4 w-4" /></span>
         <span><span className="block font-medium">{c.nickname}</span>
         <span className="block text-xs text-muted-foreground">{c.network} · {c.last4 ? `•••• ${c.last4}` : "not issued yet"}</span></span>
       </span>
     ) },
-    { key: "holder", header: "Cardholder", sort: c => c.holder, hideBelow: "md", cell: c => c.holder },
-    { key: "kind", header: "Type", hideBelow: "lg", cell: c => c.kind },
-    { key: "currency", header: "Currency", hideBelow: "lg", cell: c => c.currency },
-    { key: "status", header: "Status", sort: c => c.status, cell: c => <StatusBadge status={c.status} /> },
-    { key: "available", header: "Available", align: "right", sort: c => c.available, cell: c => formatMoney(c.available, c.currency) },
-    { key: "spent", header: "Total spend", align: "right", sort: c => c.totalSpent, hideBelow: "md", cell: c => formatMoney(c.totalSpent, c.currency) },
-    { key: "source", header: "Source", hideBelow: "lg", cell: c => c.source },
-    { key: "createdBy", header: "Created by", hideBelow: "lg", cell: c => <span className="text-muted-foreground">{c.createdBy}</span> },
-    { key: "created", header: "Created", sort: c => c.createdAt, hideBelow: "md", cell: c => <span className="text-muted-foreground">{new Date(c.createdAt).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}</span> },
+    { key: "holder", header: "CARDHOLDER", sort: c => c.holder, hideBelow: "md", cell: c => c.holder },
+    { key: "kind", header: "TYPE", hideBelow: "lg", cell: c => c.kind },
+    { key: "currency", header: "CURRENCY", hideBelow: "lg", cell: c => c.currency },
+    { key: "status", header: "STATUS", sort: c => c.status, cell: c => <StatusBadge status={c.status} /> },
+    { key: "available", header: "AVAILABLE", align: "right", sort: c => c.available, cell: c => formatMoney(c.available, c.currency) },
+    { key: "spent", header: "TOTAL SPEND", align: "right", sort: c => c.totalSpent, hideBelow: "md", cell: c => formatMoney(c.totalSpent, c.currency) },
+    { key: "source", header: "SOURCE", hideBelow: "lg", cell: c => c.source },
+    { key: "created", header: "CREATED", sort: c => c.createdAt, hideBelow: "md", cell: c => <span className="text-muted-foreground">{new Date(c.createdAt).toLocaleDateString("en-NG", { day: "numeric", month: "short", year: "numeric" })}</span> },
   ];
 
   return (
@@ -104,11 +99,9 @@ export function CardsPage() {
         }))} />
         <Toolbar right={<DateRangeSelect value={range} onChange={setRange} />}>
           <SearchInput value={search} onChange={setSearch} placeholder="Search holder, nickname, ID or last 4" />
-          <FilterSelect label="Status" value={status} onChange={setStatus} options={["All", "Active", "Paused", "Pending", "Terminated", "Expired"]} />
           <FilterSelect label="Currency" value={currency} onChange={setCurrency} options={["All", ...CURRENCIES]} />
           <FilterSelect label="Type" value={kind} onChange={setKind} options={["All", "Virtual", "Physical"]} />
           <FilterSelect label="Network" value={network} onChange={setNetwork} options={["All", ...NETWORKS]} />
-          <FilterSelect label="Source" value={source} onChange={setSource} options={["All", "Dashboard", "API"]} />
           <FilterSelect label="Created by" value={createdBy} onChange={setCreatedBy} options={["All", ...creators]} />
         </Toolbar>
         <DataTable
