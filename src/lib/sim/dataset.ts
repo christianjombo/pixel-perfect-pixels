@@ -157,10 +157,12 @@ function makeCustomers(rng: Rng, count: number): Customer[] {
   let i = out.length;
   while (out.length < count) {
     const isOrg = chance(rng, 0.22);
-    const name = isOrg
+    let name = isOrg
       ? `${pick(rng, ORG_A)} ${pick(rng, ORG_B)}`
       : `${pick(rng, FIRST)} ${pick(rng, LAST)}`;
-    if (used.has(name)) continue;
+    // Name pools are finite; disambiguate duplicates with a branch/unit suffix.
+    let n = 2;
+    while (used.has(name)) name = `${isOrg ? `${pick(rng, ORG_A)} ${pick(rng, ORG_B)}` : `${pick(rng, FIRST)} ${pick(rng, LAST)}`} ${isOrg ? `(${n++})` : String.fromCharCode(64 + n++) + "."}`;
     used.add(name);
     const [city, country] = pick(rng, CITIES);
     const slug = name.toLowerCase().replace(/[^a-z]+/g, ".").replace(/^\.|\.$/g, "");
