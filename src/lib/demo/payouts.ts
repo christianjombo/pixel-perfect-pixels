@@ -52,7 +52,7 @@ export function parsePayoutCsv(text: string): BulkRow[] {
   let row: string[] = [];
   let cell = "";
   let quoted = false;
-  const input = text.replace(/^﻿/, ""); // strips a leading BOM
+  const input = text.replace(/^\uFEFF/, ""); // strips a leading BOM
   for (let i = 0; i < input.length; i++) {
     const c = input[i]!;
     if (c === '"') {
