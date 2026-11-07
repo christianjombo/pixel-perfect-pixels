@@ -27,6 +27,14 @@ type Options<T> = {
 
 const isBrowser = () => typeof window !== "undefined" && typeof window.localStorage !== "undefined";
 
+/** All stores register their hydrate here; `hydrateSimStores()` runs once post-mount. */
+const hydrators = new Set<() => void>();
+
+/** Apply persisted mutations to every sim store. Call once from a top-level effect. */
+export function hydrateSimStores() {
+  hydrators.forEach((h) => h());
+}
+
 export function createSimStore<T>(key: string, build: (env: SimEnv) => T, opts: Options<T> = {}) {
   let env: SimEnv = currentEnv();
   let state: T | undefined;
@@ -83,7 +91,7 @@ export function createSimStore<T>(key: string, build: (env: SimEnv) => T, opts: 
     }
   };
 
-  if (isBrowser()) queueMicrotask(hydrate);
+  if (isBrowser()) hydrators.add(hydrate);
 
   onEnvChange((next) => {
     env = next;
