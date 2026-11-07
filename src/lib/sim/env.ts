@@ -4,8 +4,7 @@
  * sample data, never real financial data.
  */
 import { getDataset, type SimDataset, type SimEnv } from "./dataset";
-import { useLiveMode } from "@/lib/live-mode";
-import { liveModeStore } from "@/lib/live-mode";
+import { useLiveMode, liveModeStore } from "@/lib/live-mode";
 
 export type { SimEnv };
 
