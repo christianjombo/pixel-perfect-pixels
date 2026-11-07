@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_ANALYTICS, change, periodWindow, previousWindow, reportingDay, filterFinancial, financeMetrics, commerceMetrics, customerAnalytics, filterOrders, series, validWindow } from '@/lib/demo/insights';
+import { DEFAULT_ANALYTICS, breakdown, businessHighlights, change, periodWindow, previousWindow, reportingDay, filterFinancial, financeMetrics, commerceMetrics, customerAnalytics, filterOrders, series, validWindow } from '@/lib/demo/insights';
 import { mergeTxns } from '@/lib/demo/unified';
 import { INITIAL_LEDGER } from '@/lib/demo/ledger';
 import { transfersStore } from '@/lib/demo/transfers';
@@ -33,4 +33,6 @@ describe('Insights metric rules', () => {
   it('empty daily buckets are retained and chart reconciles to successful volume', () => { const points = series([txn({}), txn({ status: 'Failed', amount: 9000 })], [], { from: '2026-10-20', to: '2026-10-22' }, 'Payment volume', 'Daily', 'Africa/Lagos'); expect(points).toEqual([{ key: '2026-10-20', value: 0 }, { key: '2026-10-21', value: 0 }, { key: '2026-10-22', value: 1000 }]); });
   it('does not invent processing or reconciliation measurements', () => { const m = financeMetrics([txn({ type: 'Settlement' })], 'Settlements'); expect(m.find(r => r.label === 'Average processing time')?.value).toBeNull(); expect(m.find(r => r.label === 'Reconciliation exceptions')?.value).toBeNull(); });
   it('invalid or reversed custom dates are rejected', () => { expect(validWindow({ from: 'invalid', to: '2026-10-22' })).toBe(false); expect(validWindow({ from: '2026-10-22', to: '2026-10-01' })).toBe(false); });
+  it('pending settlement breakdown preserves the recorded pending amount', () => { const rows = breakdown([txn({ type: 'Settlement', status: 'Pending', amount: 4500 })], r => r.status, false); expect(rows[0]?.amount).toBe(4500); });
+  it('highlights do not claim a success-rate increase without a previous cohort', () => { const h = businessHighlights([txn({})], [], w, previousWindow(w)); expect(h.find(r => r.title === 'Payment success rate')?.change).toBeNull(); });
 });

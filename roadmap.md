@@ -1,10 +1,10 @@
 # Roadmap
 
 ## Insights complete redesign
-- [ ] Canonical analytics model: reporting dates, currency-safe metrics, comparisons and shared operational data
-- [ ] Six-tab workspace: global/tab filters, interactive charts, precise tables and drill-downs
-- [ ] Permission-aware CSV/PDF export and Test/Live separation with honest unavailable states
-- [ ] Metric tests and desktop/mobile end-to-end verification
+- [x] Canonical analytics model: reporting dates, currency-safe metrics, comparisons and shared operational data
+- [x] Six-tab workspace: global/tab filters, interactive charts, precise tables and drill-downs
+- [x] Permission-aware CSV/PDF export and explicit sample-only Test/Live views; connected data and missing instrumentation remain unavailable
+- [x] Metric tests and desktop/mobile end-to-end verification
 
 ## Dashboard pages (brief: Design Griv Dashboard Pages)
 - [x] Shared building blocks (page header, tables, filters, drawers, dialogs, status badges, money formatting, sample data)
