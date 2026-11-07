@@ -11,11 +11,12 @@ import { FormDialog, EmptyState } from '@/components/griv/kit';
 import { useLiveMode } from '@/lib/live-mode';
 import { CURRENCIES, type Currency } from '@/lib/money';
 import { getAIWorkspace, listAIThreads, createAIThread, getAIThread, updateAIThread, deleteAIThread } from '@/lib/ai/conversations.functions';
+import { setPendingPrompt } from '@/lib/ai/pending-prompt';
 import { LogoMark } from '@/components/griv/Logo';
 import { ChatWindow } from './ChatWindow';
 export function AIPage({threadId,embedded=false,onExpand}:{threadId?:string;embedded?:boolean;onExpand?:()=>void}){
  const live=useLiveMode();const environment=live?'live':'test';const navigate=useNavigate();const qc=useQueryClient();const path=useRouterState({select:s=>s.location.pathname});
- const [history,setHistory]=useState(!embedded);const [context,setContext]=useState(false);const [search,setSearch]=useState('');const [currency,setCurrency]=useState<Currency>('NGN');const [period,setPeriod]=useState('Last 30 days');const [pendingPrompt,setPendingPrompt]=useState('');const [creating,setCreating]=useState(false);const [rename,setRename]=useState<{id:string;title:string;pinned:boolean}|null>(null);const [remove,setRemove]=useState<string|null>(null);
+ const [history,setHistory]=useState(!embedded);const [context,setContext]=useState(false);const [search,setSearch]=useState('');const [currency,setCurrency]=useState<Currency>('NGN');const [period,setPeriod]=useState('Last 30 days');const [creating,setCreating]=useState(false);const [rename,setRename]=useState<{id:string;title:string;pinned:boolean}|null>(null);const [remove,setRemove]=useState<string|null>(null);
  const workspace=useQuery({queryKey:['ai-workspace'],queryFn:()=>getAIWorkspace()});
  const threads=useQuery({queryKey:['ai-threads',environment],queryFn:()=>listAIThreads({data:{environment}})});
  const thread=useQuery({queryKey:['ai-thread',threadId,environment],queryFn:()=>getAIThread({data:{threadId:threadId??'',environment}}),enabled:!!threadId});
