@@ -1,5 +1,12 @@
 # Roadmap
 
+## Griv AI complete product redesign
+- [ ] Foundation: secure sign-in, server-validated business scope, saved threaded conversations and real streaming AI
+- [ ] Workspace: history, composer, context, grounded tool results, charts/tables and record links
+- [ ] Intelligence: read-only canonical tools, comparisons, reports and contextual drawer shared with full conversations
+- [ ] Operational previews: explicit confirmation and unavailable execution/automation/file services until securely connected
+- [ ] Verify isolation, multi-turn history/reload, streaming/cancellation, exports and desktop/mobile layout
+
 ## Insights complete redesign
 - [x] Canonical analytics model: reporting dates, currency-safe metrics, comparisons and shared operational data
 - [x] Six-tab workspace: global/tab filters, interactive charts, precise tables and drill-downs
