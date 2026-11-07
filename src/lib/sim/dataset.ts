@@ -445,7 +445,7 @@ export function generateDataset(env: SimEnv): SimDataset {
       providerRef: `iss_${id.slice(5)}`,
       issueRef: `TXN-ISS-${cardRef++}`,
       fundingModel: "Prefunded",
-      fundingSource: currency === "NGN" ? "acc_ngn_main" : "acc_usd",
+      fundingSource: currency === "NGN" ? "NGN business balance" : "USD business balance",
       limits: { perTransaction: perTxn, daily: perTxn * 3, monthly: perTxn * 12 },
       restrictions: { categories: [], countries: [], channels: ["Online", "In-store", "ATM"] },
       autoFunding: { enabled: false, threshold: 0, topUp: 0, source: "", maxPerTopUp: 0, dailyCap: 0, monthlyCap: 0, minIntervalHours: 24 },
@@ -558,7 +558,8 @@ export function generateDataset(env: SimEnv): SimDataset {
       else if (p.status === "Pending") pending -= p.amount + p.fee;
     }
     for (const f of cardFunding) {
-      if (f.source !== skel.id) continue;
+      // Funding sources are display labels ("NGN business balance"); map back to the account.
+      if (accountFor(f.currency) !== skel.id && !(f.currency === "NGN" && skel.id === "acc_ngn_main")) continue;
       if (f.status === "Completed") net -= f.amount;
       else if (f.status === "Processing") pending -= f.amount;
     }
