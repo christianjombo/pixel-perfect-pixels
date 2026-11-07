@@ -1,11 +1,12 @@
 # Roadmap
 
 ## Griv AI complete product redesign
-- [ ] Foundation: secure sign-in, server-validated business scope, saved threaded conversations and real streaming AI
-- [ ] Workspace: history, composer, context, grounded tool results, charts/tables and record links
-- [ ] Intelligence: read-only canonical tools, comparisons, reports and contextual drawer shared with full conversations
-- [ ] Operational previews: explicit confirmation and unavailable execution/automation/file services until securely connected
-- [ ] Verify isolation, multi-turn history/reload, streaming/cancellation, exports and desktop/mobile layout
+- [x] Phase 1 implementation: secure sign-in, server-validated business scope, saved threaded conversations and real streaming AI
+- [x] Phase 1 workspace: history, composer, context, grounded read-only sample tools, charts/tables, reports and record links
+- [x] Non-executing operational previews; financial execution, automation and file services explicitly unavailable
+- [x] Verify read-only currency/environment rules, public desktop/mobile sign-in, unauthorized rejection and real gateway streaming
+- [ ] Authenticated verification: multi-thread reload, multi-turn tool calls, cancellation and exports — blocked by absence of a confirmed AI account
+- [ ] Later phase: contextual shared-conversation drawer and connected operational data/actions — requires expansion beyond the initial phase and real providers
 
 ## Insights complete redesign
 - [x] Canonical analytics model: reporting dates, currency-safe metrics, comparisons and shared operational data
