@@ -122,3 +122,11 @@
 - [x] Credit: applications and pending-only requests, no fabricated offers
 - [x] AI: clearly labelled local demo answers from shared business data
 - [x] Navigation, rules tests and desktop/mobile browser verification (150 tests pass; six page workflows checked, no browser errors)
+
+## Cards management redesign (brief: Complete Cards Management Redesign)
+- [x] Enterprise cards data module with 27 sample cards, transactions, funding history and activity (src/lib/demo/cards.ts)
+- [x] Cards overview: metrics per currency, status tabs, full filters, sortable table, export, issue flow with review
+- [x] Card details page /cards/$cardId with Overview, Transactions, Funding, Controls, Activity tabs
+- [x] Lifecycle actions: pause/resume/terminate (irreversible, reason required), limits, automatic funding rules
+- [x] Funding stays Processing until issuer confirms; sensitive card details never stored or shown
+- [x] Verify: 157 tests pass (7 new card rules), typecheck, build OK, browser check of list/detail/funding/issuance
