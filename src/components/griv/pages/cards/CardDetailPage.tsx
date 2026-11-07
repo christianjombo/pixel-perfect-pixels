@@ -150,7 +150,7 @@ function OverviewTab({ card }: { card: DemoCardFull }) {
         ]} />
         <p className="text-sm text-muted-foreground">
           Related records: <Link to="/balances" className="font-medium text-primary hover:underline">Balances</Link> ·{" "}
-          <Link to="/transactions" className="font-medium text-primary hover:underline">Transactions</Link>
+          <Link to="/transactions" search={{ q: "" }} className="font-medium text-primary hover:underline">Transactions</Link>
         </p>
       </div>
     </div>
@@ -186,7 +186,7 @@ function FundingTab({ card, funding, onFund, onAuto }: { card: DemoCardFull; fun
     { key: "by", header: "Initiated by", hideBelow: "lg", cell: f => <span className="text-muted-foreground">{f.initiatedBy}</span> },
     { key: "channel", header: "Channel", hideBelow: "md", cell: f => f.channel },
     { key: "status", header: "Status", cell: f => <StatusBadge status={f.status} /> },
-    { key: "txn", header: "Linked transaction", hideBelow: "lg", cell: f => <Link to="/transactions" className="font-medium text-primary hover:underline">{f.linkedTxn}</Link> },
+    { key: "txn", header: "Linked transaction", hideBelow: "lg", cell: f => <Link to="/transactions" search={{ q: f.linkedTxn }} className="font-medium text-primary hover:underline">{f.linkedTxn}</Link> },
   ];
   return (
     <div className="space-y-6">
@@ -425,7 +425,7 @@ function TxnDialog({ txn, onClose }: { txn: CardTransaction | null; onClose: () 
             ["Reference", txn.ref],
             ["Status history", `${txn.type === "Decline" ? "Requested → Declined" : txn.status === "Refunded" ? "Authorized → Captured → Refunded" : "Authorized → " + txn.status}`],
           ]} />
-          <p className="text-sm text-muted-foreground">Linked Griv record: <Link to="/transactions" className="font-medium text-primary hover:underline">{txn.ref}</Link></p>
+          <p className="text-sm text-muted-foreground">Linked Griv record: <Link to="/transactions" search={{ q: txn.ref }} className="font-medium text-primary hover:underline">{txn.ref}</Link></p>
         </div>
       )}
     </FormDialog>
