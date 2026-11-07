@@ -559,7 +559,7 @@ export function generateDataset(env: SimEnv): SimDataset {
     }
     for (const f of cardFunding) {
       // Funding sources are display labels ("NGN business balance"); map back to the account.
-      if (accountFor(f.currency) !== skel.id && !(f.currency === "NGN" && skel.id === "acc_ngn_main")) continue;
+      if (accountFor(f.currency) !== skel.id) continue;
       if (f.status === "Completed") net -= f.amount;
       else if (f.status === "Processing") pending -= f.amount;
     }
