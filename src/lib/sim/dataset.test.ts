@@ -98,7 +98,8 @@ describe("shared simulation dataset", () => {
         if (src === a.id && f.status === "Completed") net -= f.amount;
       }
       const opening = a.available - net;
-      expect(opening).toBeGreaterThanOrEqual(0);
+      // round2 in the generator introduces sub-cent drift; allow it.
+      expect(opening).toBeGreaterThanOrEqual(-0.01);
     }
   });
 
