@@ -27,7 +27,7 @@ export function createBusinessTools(scope:{environment:string; currency:string; 
   const orders=filterOrders(orderStore.get(),{...DEFAULT_ANALYTICS,...w,currency},customersStore.get(),scope.timezone);
   if(['overview','payments','transfers','settlements'].includes(q.module)) {
    const tab=q.module==='transfers'?'Transfers':q.module==='settlements'?'Settlements':q.module==='payments'?'Payments':'Overview';
-   if(tab==='Transfers') rows=rows.filter(r=>['Transfer','Payout'].includes(r.type)); if(tab==='Settlements') rows=rows.filter(r=>r.type==='Settlement'); if(tab==='Payments') rows=rows.filter(r=>['Payment','Payout'].includes(r.type));
+   if(tab==='Transfers') rows=rows.filter(r=>['Transfer','Payout'].includes(r.type)); if(tab==='Settlements') rows=rows.filter(r=>r.type==='Settlement'); if(tab==='Payments') rows=rows.filter(r=>r.type==='Payment');
    result.metrics=financeMetrics(rows,tab); const metric=tab==='Transfers'?'Transfer volume':tab==='Settlements'?'Settlement volume':'Payment volume'; result.series=series(rows,[],w,metric,'Daily',scope.timezone).map(r=>({...r,previous:0}));
    result.rows=rows.slice(0,25).map(r=>({id:r.id,name:`${r.type} · ${r.method}`,amount:r.amount,status:r.status,route:`/transactions?q=${encodeURIComponent(r.id)}`}));
    result.limitations.push('Processing delays are not inferred; only provider-recorded failure reasons are evidence.');
