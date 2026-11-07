@@ -58,8 +58,8 @@ export function createSimStore<T>(key: string, build: (env: SimEnv) => T, opts: 
       if (!raw) return undefined;
       const parsed = JSON.parse(raw);
       if (opts.overlay) {
-        const o = parsed as Overlay<never>;
-        return applyOverlay(base(), o);
+        const o = parsed as Overlay<{ id: string }>;
+        return applyOverlay(base() as unknown as { id: string }[], o) as unknown as T;
       }
       return parsed as T;
     } catch {
@@ -71,7 +71,10 @@ export function createSimStore<T>(key: string, build: (env: SimEnv) => T, opts: 
     if (!isBrowser() || state === undefined) return;
     try {
       if (opts.overlay) {
-        window.localStorage.setItem(storageKey(env), JSON.stringify(toOverlay(base(), state)));
+        window.localStorage.setItem(
+          storageKey(env),
+          JSON.stringify(toOverlay(base() as unknown as { id: string }[], state as unknown as { id: string }[])),
+        );
       } else {
         window.localStorage.setItem(storageKey(env), JSON.stringify(state));
       }

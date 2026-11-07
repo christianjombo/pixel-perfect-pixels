@@ -307,7 +307,7 @@ export function generateDataset(env: SimEnv): SimDataset {
       sourceChannel: "Dashboard",
       accountId: parent.accountId,
       parentId: parent.id,
-      customerId: parent.customerId,
+      ...(parent.customerId ? { customerId: parent.customerId } : {}),
     });
   }
   // Monthly processing-fee rows per account.
